@@ -29,6 +29,31 @@ module.exports = {
           'justify-content': 'center',
           'align-items': 'center',
         },
+        '.outline-r': {
+          outline: 'solid',
+          'outline-width': '2px',
+          'outline-color': 'red',
+        },
+        '.outline-b': {
+          outline: 'solid',
+          'outline-width': '2px',
+          'outline-color': 'blue',
+        },
+        '.outline-d': {
+          outline: 'solid',
+          'outline-width': '2px',
+          'outline-color': 'black',
+        },
+        '.outline-g': {
+          outline: 'solid',
+          'outline-width': '2px',
+          'outline-color': 'green',
+        },
+        '.outline-o': {
+          outline: 'solid',
+          'outline-width': '2px',
+          'outline-color': 'orange',
+        },
       });
 
       addVariant('data-active', ({ modifySelectors, separator }) => {
