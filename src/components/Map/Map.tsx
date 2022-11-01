@@ -1,17 +1,23 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { memo, useRef, useState } from 'react';
-import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
-import { FaLocationArrow } from 'react-icons/fa';
+import React, { memo, useRef, useState, useEffect } from 'react';
+import {
+  GoogleMap,
+  useJsApiLoader,
+  Marker,
+  DistanceMatrixService,
+} from '@react-google-maps/api';
+import { GiAbstract103 } from 'react-icons/gi';
 
 const Map = memo(() => {
   // 地圖要顯示的中心位置   // TODO 動態更新使用者坐標
-  const [center] = useState<google.maps.LatLngLiteral>({
-    lat: 25.033816614731652,
-    lng: 121.56470775604248,
-  });
+  const [center, setCenter] = useState<google.maps.LatLngLiteral>(
+    {} as google.maps.LatLngLiteral,
+  );
   const [clickedPlace, setClickedPlace] = useState<google.maps.LatLngLiteral>(
     {} as google.maps.LatLngLiteral,
   );
+  const [getLocationStatus, setGetLocationStatus] = useState<string | null>(null);
+
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_API_KEY!,
   });
@@ -28,29 +34,48 @@ const Map = memo(() => {
   // 點擊地圖取得點擊地點座標
   const onMapClick = (e: google.maps.MapMouseEvent) => {
     if (e.latLng) {
-      console.log(`lat: ${e.latLng.lat()}, lng: ${e.latLng.lng()}`);
       setClickedPlace({ lat: e.latLng.lat(), lng: e.latLng.lng() });
+    }
+  };
+
+  const getLocation = () => {
+    if (!navigator.geolocation) {
+      setGetLocationStatus('Geolocation is not supported by your browser');
+    } else {
+      navigator.geolocation.getCurrentPosition((position) => {
+        setCenter({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        });
+      });
     }
   };
 
   // TODO 取得點擊地點坐標後打api取得附近停車場資料
   // TODO 計算附近停車場與使用者距離
 
+  useEffect(() => {
+    getLocation();
+  }, []);
+
   if (!isLoaded) {
     return <div>Loading...</div>;
   }
+  // eslint-disable-next-line no-alert
+  if (getLocationStatus) alert(getLocationStatus);
 
   return (
-    <div className="relative h-screen w-screen">
-      <div className=" absolute bottom-1/4 right-3 z-[1]">
+    <div className="relative h-full w-full">
+      {/* Location Icon */}
+      <div className=" absolute bottom-5 right-2 z-[1]">
         <button
-          className="rounded-full border-2 bg-gray-300 p-3 shadow-md shadow-slate-400"
+          className="rounded-full border-2 bg-gray-300 p-1 shadow-md shadow-slate-400"
           onClick={() => mapRef.current?.panTo(center)}
         >
-          <FaLocationArrow />
+          <GiAbstract103 size="2rem" />
         </button>
       </div>
-      <div className="h-screen w-full">
+      <div className="h-full w-full">
         <GoogleMap
           center={center} // 地圖中央座標
           zoom={15} // 地圖縮放大小，數字越大越近
@@ -60,7 +85,7 @@ const Map = memo(() => {
             streetViewControl: false,
             mapTypeControl: false,
             fullscreenControl: false,
-            // zoomControl: false,
+            zoomControl: false,
           }}
           onLoad={onLoad}
           onUnmount={onUnMount}
@@ -68,6 +93,18 @@ const Map = memo(() => {
         >
           <Marker position={center} />
           {clickedPlace && <Marker position={clickedPlace} />}
+
+          {/* 記算所在地與其他地點的距離 */}
+          <DistanceMatrixService
+            options={{
+              destinations: [{ lat: 25.0360887107026, lng: 121.56299732925 }], // 上限25個
+              origins: [center],
+              travelMode: google.maps.TravelMode.DRIVING,
+            }}
+            callback={(response) => {
+              console.log(response?.rows[0].elements[0].distance);
+            }}
+          />
         </GoogleMap>
       </div>
     </div>
