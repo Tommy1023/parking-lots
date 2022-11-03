@@ -3,44 +3,43 @@ import React, { memo, useRef, useState, useEffect } from 'react';
 import {
   GoogleMap,
   useJsApiLoader,
-  Marker,
-  DistanceMatrixService,
+  MarkerF,
+  // DistanceMatrixService,
 } from '@react-google-maps/api';
 import { GiAbstract103 } from 'react-icons/gi';
+import useStore from '../../../store';
+import CustomMarker from './components/CustomMarker';
 
 const Map = memo(() => {
-  // 地圖要顯示的中心位置   // TODO 動態更新使用者坐標
-  const [center, setCenter] = useState<google.maps.LatLngLiteral>(
-    {} as google.maps.LatLngLiteral,
-  );
-  const [clickedPlace, setClickedPlace] = useState<google.maps.LatLngLiteral>(
-    {} as google.maps.LatLngLiteral,
-  );
-  const [getLocationStatus, setGetLocationStatus] = useState<string | null>(null);
-
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_API_KEY!,
   });
+  const { parkingLots } = useStore((state) => {
+    return {
+      markers: state.markers,
+      parkingLots: state.parkingLots,
+    };
+  });
+  // 地圖要顯示的中心位置
+  const [center, setCenter] = useState<google.maps.LatLngLiteral>(
+    {} as google.maps.LatLngLiteral,
+  );
+  const [activeMarker, setActiveMarker] = useState<string | null>(null);
   // 使用 useRef 綁定 DOM 設定地圖存放位置
   const mapRef = useRef<google.maps.Map | null>(null);
 
-  const onLoad = (map: google.maps.Map): void => {
-    mapRef.current = map;
-  };
-
-  const onUnMount = (): void => {
-    mapRef.current = null;
-  };
-  // 點擊地圖取得點擊地點座標
+  // 點擊地圖取得點擊地點座標，並使用 panTo 將地圖移動至點擊地點。
   const onMapClick = (e: google.maps.MapMouseEvent) => {
     if (e.latLng) {
-      setClickedPlace({ lat: e.latLng.lat(), lng: e.latLng.lng() });
+      setActiveMarker(null);
+      mapRef.current?.panTo({ lat: e.latLng.lat(), lng: e.latLng.lng() });
     }
   };
-
+  // 取得使用者坐標
   const getLocation = () => {
     if (!navigator.geolocation) {
-      setGetLocationStatus('Geolocation is not supported by your browser');
+      // eslint-disable-next-line no-alert
+      alert('Geolocation is not supported by your browser');
     } else {
       navigator.geolocation.getCurrentPosition((position) => {
         setCenter({
@@ -50,9 +49,14 @@ const Map = memo(() => {
       });
     }
   };
+  // infoWindow 開關，判斷被點擊的 marker
+  const handleActiveMarker = (marker: string) => {
+    if (marker !== activeMarker) setActiveMarker(marker);
+  };
 
   // TODO 取得點擊地點坐標後打api取得附近停車場資料
   // TODO 計算附近停車場與使用者距離
+  // TODO 動態更新使用者坐標
 
   useEffect(() => {
     getLocation();
@@ -61,8 +65,6 @@ const Map = memo(() => {
   if (!isLoaded) {
     return <div>Loading...</div>;
   }
-  // eslint-disable-next-line no-alert
-  if (getLocationStatus) alert(getLocationStatus);
 
   return (
     <div className="relative h-full w-full">
@@ -75,6 +77,8 @@ const Map = memo(() => {
           <GiAbstract103 size="2rem" />
         </button>
       </div>
+
+      {/* google map */}
       <div className="h-full w-full">
         <GoogleMap
           center={center} // 地圖中央座標
@@ -87,15 +91,23 @@ const Map = memo(() => {
             fullscreenControl: false,
             zoomControl: false,
           }}
-          onLoad={onLoad}
-          onUnmount={onUnMount}
+          onLoad={(map: google.maps.Map): void => {
+            mapRef.current = map;
+          }}
+          onUnmount={(): void => {
+            mapRef.current = null;
+          }}
           onClick={onMapClick}
         >
-          <Marker position={center} />
-          {clickedPlace && <Marker position={clickedPlace} />}
-
-          {/* 記算所在地與其他地點的距離 */}
-          <DistanceMatrixService
+          <MarkerF position={center} />
+          <CustomMarker
+            parkingLots={parkingLots}
+            activeMarker={activeMarker}
+            onSetActiveMarKer={setActiveMarker}
+            onHandleActiveMarker={handleActiveMarker}
+          />
+          {/* TODO 記算所在地與其他地點的距離 */}
+          {/* <DistanceMatrixService
             options={{
               destinations: [{ lat: 25.0360887107026, lng: 121.56299732925 }], // 上限25個
               origins: [center],
@@ -104,7 +116,7 @@ const Map = memo(() => {
             callback={(response) => {
               console.log(response?.rows[0].elements[0].distance);
             }}
-          />
+          /> */}
         </GoogleMap>
       </div>
     </div>
