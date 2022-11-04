@@ -9,17 +9,20 @@ const CustomMarker = ({
   activeMarker,
   onSetActiveMarKer,
   onHandleActiveMarker,
+  onSetMapCenter,
 }: {
   parkingLots: Array<Park>;
   activeMarker: string | null;
   onSetActiveMarKer: (id: string | null) => void;
-  onHandleActiveMarker: (id: string) => void;
+  onHandleActiveMarker: (id: string | null) => void;
+  onSetMapCenter: ({ lat, lng }: { lat: number; lng: number }) => void;
 }) => {
   return (
     <>
       {parkingLots.map(({ id, name, tw97x, tw97y }) => {
-        const numTw97x: number = +tw97x;
-        const numTw97y: number = +tw97y;
+        const numTw97x: number = +tw97x!;
+        const numTw97y: number = +tw97y!;
+        const transPosition = twd97ToLatlng(numTw97x, numTw97y);
         return (
           <MarkerF
             key={id}
@@ -31,8 +34,11 @@ const CustomMarker = ({
               strokeColor: 'blue',
               strokeWeight: 2,
             }}
-            position={twd97ToLatlng(numTw97x, numTw97y)}
-            onClick={() => onHandleActiveMarker(id)}
+            position={transPosition}
+            onClick={() => {
+              onHandleActiveMarker(id);
+              onSetMapCenter(transPosition);
+            }}
           >
             {activeMarker === id && (
               <InfoWindowF onCloseClick={() => onSetActiveMarKer(null)}>

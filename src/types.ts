@@ -1,66 +1,65 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export type State = {
-  parkingLots: any;
-  allAvailable: any;
-  markers: Array<Markers>;
+  isAppInitializedComplete: boolean;
+  isLoading: boolean;
+  parkingLots: Array<Park> | null;
+  allAvailable: Array<AvailablePark> | null;
+  userCenter: google.maps.LatLngLiteral | null;
+  mapCenter: google.maps.LatLngLiteral | null;
+  watchId: number | null;
 };
 
 export type Action = {
-  getParkingLots: () => void;
-  getAllAvailable: () => void;
-};
-
-export type Markers = {
-  id: number;
-  name: string;
-  position: google.maps.LatLngLiteral;
+  init: () => void;
+  updateParkingLots: () => void;
+  updateAllAvailable: () => void;
 };
 
 export type Park = {
-  id: string;
-  area: string;
-  name: string;
-  type: string;
-  type2: string;
-  summary: string;
-  address: string;
-  tel: string;
-  payex: string;
-  serviceTime: string;
-  tw97x: string;
-  tw97y: string;
-  totalcar: number;
-  totalmotor: number;
-  totalbike: number;
-  totalbus: number;
-  Pregnancy_First: string;
-  Handicap_First: string;
-  Taxi_OneHR_Free: string;
-  AED_Equipment: string;
-  CellSignal_Enhancement: string;
-  Accessibility_Elevator: string;
-  Phone_Charge: string;
-  Child_Pickup_Area: string;
+  id: string | null;
+  area: string | null;
+  name: string | null;
+  type: string | null;
+  type2: string | null;
+  summary: string | null;
+  address: string | null;
+  tel: string | null;
+  payex: string | null;
+  serviceTime: string | null;
+  tw97x: string | null;
+  tw97y: string | null;
+  totalcar: number | null;
+  totalmotor: number | null;
+  totalbike: number | null;
+  totalbus: number | null;
+  Pregnancy_First: string | null;
+  Handicap_First: string | null;
+  Taxi_OneHR_Free: string | null;
+  AED_Equipment: string | null;
+  CellSignal_Enhancement: string | null;
+  Accessibility_Elevator: string | null;
+  Phone_Charge: string | null;
+  Child_Pickup_Area: string | null;
   FareInfo: {
     WorkingDay: [
       {
-        Period: string;
-        Fare: string;
+        Period: string | null;
+        Fare: string | null;
       },
     ];
     Holiday: [
       {
-        Period: string;
-        Fare: string;
+        Period: string | null;
+        Fare: string | null;
       },
     ];
   };
   EntranceCoord: {
     EntrancecoordInfo: [
       {
-        Xcod: string;
-        Ycod: string;
-        Address: string;
+        Xcod: string | null;
+        Ycod: string | null;
+        Address: string | null;
       },
     ];
   };

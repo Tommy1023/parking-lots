@@ -8,12 +8,15 @@ import {
   FaRegBookmark,
 } from 'react-icons/fa';
 import style from './layout.module.scss';
+import IsLoading from '../../../containers/IsLoading';
 
 const Home = () => {
   return (
     <div className="h-screen w-screen flex-col">
       <div className="h-[90%]">
-        <Outlet />
+        <IsLoading>
+          <Outlet />
+        </IsLoading>
       </div>
       <div className={style.root}>
         <NavLink to="map">

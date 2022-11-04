@@ -1,3 +1,26 @@
 {
-  "cSpell.words": ["destiantion", "EPSG", "Latlng", "Whmcs", "zustand"]
+  "cSpell.words": [
+    "abrv",
+    "availablebus",
+    "availablecar",
+    "availablemotor",
+    "destiantion",
+    "ellps",
+    "Entrancecoord",
+    "EPSG",
+    "Latlng",
+    "longlat",
+    "payex",
+    "Scoket",
+    "tmerc",
+    "totalbike",
+    "totalbus",
+    "totalcar",
+    "totalmotor",
+    "towgs",
+    "Whmcs",
+    "Xcod",
+    "Ycod",
+    "zustand"
+  ]
 }

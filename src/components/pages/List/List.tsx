@@ -11,8 +11,8 @@ const List = () => {
 
   return (
     <pre className="h-full overflow-y-scroll text-start">
-      {JSON.stringify(parkingLots[0], null, 2)}
-      {JSON.stringify(allAvailable[0], null, 2)}
+      {JSON.stringify(parkingLots?.[0], null, 2)}
+      {JSON.stringify(allAvailable?.[0], null, 2)}
     </pre>
   );
 };
