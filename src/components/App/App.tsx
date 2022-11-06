@@ -31,9 +31,30 @@ const App = () => {
           <Route path="/" element={<Layout />}>
             <Route path="map" element={<Map />} />
             <Route path="parkingList" element={<List />} />
-            <Route path="keeps" element={<div>keeps</div>} />
-            <Route path="user" element={<div>user</div>} />
-            <Route path="setting" element={<div>setting</div>} />
+            <Route
+              path="keeps"
+              element={
+                <div className="h-full w-full flex-center">
+                  <div>Keeps 施工中...</div>
+                </div>
+              }
+            />
+            <Route
+              path="user"
+              element={
+                <div className="h-full w-full flex-center">
+                  <div>User 施工中...</div>
+                </div>
+              }
+            />
+            <Route
+              path="setting"
+              element={
+                <div className="h-full w-full flex-center">
+                  <div>Setting 施工中...</div>
+                </div>
+              }
+            />
           </Route>
         </Routes>
       </Router>

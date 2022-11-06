@@ -10,16 +10,19 @@ import { GiAbstract103 } from 'react-icons/gi';
 import shallow from 'zustand/shallow';
 import useStore from '../../../store';
 import CustomMarker from './components/CustomMarker';
+import { latlngToTwd97 } from '../../../helpers/coordTransHelper';
+import { Park, AvailablePark } from '../../../types';
 
 const Map = memo(() => {
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_API_KEY!,
   });
-  const { parkingLots, userCenter, watchId } = useStore((state) => {
+  const { parkingLots, userCenter, watchId, allAvailable } = useStore((state) => {
     return {
       parkingLots: state.parkingLots,
       userCenter: state.userCenter,
       watchId: state.watchId,
+      allAvailable: state.allAvailable,
     };
   }, shallow);
 
@@ -41,8 +44,28 @@ const Map = memo(() => {
     if (marker !== activeMarker) setActiveMarker(marker);
   };
 
-  // TODO 取得點擊地點坐標後打api取得附近停車場資料
-  // TODO 計算附近停車場與使用者距離
+  // 取得點擊地點坐標附近停車場資料
+  const aroundParkingLots: Array<Park> | undefined = parkingLots?.filter((parkingLot) => {
+    const twd97MapCenter = latlngToTwd97(mapCenter.lat, mapCenter.lng);
+    const top = twd97MapCenter.twd97x + 1000;
+    const bottom = twd97MapCenter.twd97x - 1000;
+    const left = twd97MapCenter.twd97y - 1000;
+    const right = twd97MapCenter.twd97y + 1000;
+    return (
+      parseFloat(parkingLot.tw97x) < top &&
+      parseFloat(parkingLot.tw97x) > bottom &&
+      parseFloat(parkingLot.tw97y) > left &&
+      parseFloat(parkingLot.tw97y) < right
+    );
+  });
+  const aroundParkingLotWithAvailable: Array<Park> & {
+    parkingAvailable?: AvailablePark | undefined;
+  } = aroundParkingLots!.map((parkingLot) => {
+    const parkingAvailable = allAvailable?.filter((available) => {
+      return available.id === parkingLot.id;
+    });
+    return { ...parkingLot, parkingAvailable: parkingAvailable?.[0] };
+  });
 
   useEffect(() => {
     return () => {
@@ -88,27 +111,21 @@ const Map = memo(() => {
           }}
           onClick={onMapClick}
         >
+          {/* TODO 停車場入口 */}
           <MarkerF position={userCenter!} />
-          {parkingLots && (
-            <CustomMarker
-              parkingLots={parkingLots}
-              activeMarker={activeMarker}
-              onSetActiveMarKer={setActiveMarker}
-              onHandleActiveMarker={handleActiveMarker}
-              onSetMapCenter={setMapCenter}
-            />
-          )}
-          {/* TODO 記算所在地與其他地點的距離 */}
-          {/* <DistanceMatrixService
-            options={{
-              destinations: [{ lat: 25.0360887107026, lng: 121.56299732925 }], // 上限25個
-              origins: [userCenter],
-              travelMode: google.maps.TravelMode.DRIVING,
-            }}
-            callback={(response) => {
-              console.log(response?.rows[0].elements[0].distance);
-            }}
-          /> */}
+          {aroundParkingLotWithAvailable?.map((parkingLot) => {
+            return (
+              <CustomMarker
+                key={parkingLot.id}
+                parkingLot={parkingLot}
+                userCenter={userCenter}
+                activeMarker={activeMarker}
+                onSetActiveMarKer={setActiveMarker}
+                onHandleActiveMarker={handleActiveMarker}
+                onSetMapCenter={setMapCenter}
+              />
+            );
+          })}
         </GoogleMap>
       </div>
     </div>
