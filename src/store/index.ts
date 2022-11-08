@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 import create from 'zustand';
 import { fetchAllAvailable, fetchParkingLots } from '../service/parkingLotsApi';
 import { State, Action } from '../types';
@@ -26,14 +27,19 @@ const useStore = create<State & Action>((set) => {
           // eslint-disable-next-line no-alert
           alert('Geolocation is not supported by your browser');
         } else {
-          navigator.geolocation.getCurrentPosition((position) => {
-            set({
-              userCenter: {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude,
-              },
-            });
-          });
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              set({
+                userCenter: {
+                  lat: position.coords.latitude,
+                  lng: position.coords.longitude,
+                },
+              });
+            },
+            () => {
+              alert('無法取得定位，請稍後再試');
+            },
+          );
         }
       } catch (error) {
         console.log('getLocation error:', error);
@@ -46,6 +52,7 @@ const useStore = create<State & Action>((set) => {
           set({ parkingLots: parkingLots.data.data.park });
       } catch (error) {
         console.log('getParkingLots error:', error);
+        alert('無法取得停車場資訊，請稍後再試');
       }
 
       // 取得剩餘車位資料
@@ -55,6 +62,7 @@ const useStore = create<State & Action>((set) => {
           set({ allAvailable: allAvailable.data.data.park });
       } catch (error) {
         console.log('getAllAvailable error:', error);
+        alert('無法取得停車場資訊，請稍後再試');
       }
       set({ isAppInitializedComplete: true });
       console.log('App Initialized Complete');

@@ -13,14 +13,14 @@ type CustomMarkerProp = {
       parkingAvailable?: AvailablePark | undefined;
     },
   ) => void;
-  onSetMapCenter: ({ lat, lng }: { lat: number; lng: number }) => void;
+  onSetClickCoord: ({ lat, lng }: { lat: number; lng: number }) => void;
 };
 
 const CustomMarker = ({
   parkingLot,
   onSetActiveMarKer,
   onHandleActiveMarker,
-  onSetMapCenter,
+  onSetClickCoord,
 }: CustomMarkerProp) => {
   const { id, tw97x, tw97y, parkingAvailable } = parkingLot;
   const numTw97x = useRef<number>(parseFloat(tw97x!));
@@ -51,7 +51,7 @@ const CustomMarker = ({
       position={transPosition.current}
       onClick={() => {
         onHandleActiveMarker(id, parkingLot);
-        onSetMapCenter(transPosition.current);
+        onSetClickCoord(transPosition.current);
       }}
     />
   );

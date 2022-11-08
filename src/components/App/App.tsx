@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import shallow from 'zustand/shallow';
@@ -8,14 +9,21 @@ import Map from '../pages/Map';
 import List from '../pages/List';
 
 const App = () => {
-  const { init } = useStore((state) => {
+  const { init, updateAllAvailable } = useStore((state) => {
     return {
       init: state.init,
+      updateAllAvailable: state.updateAllAvailable,
     };
   }, shallow);
 
   useEffect(() => {
     init();
+    const interval = setInterval(() => {
+      updateAllAvailable();
+    }, 300000);
+    return () => {
+      clearInterval(interval);
+    };
   }, []);//eslint-disable-line
 
   return (

@@ -2,7 +2,7 @@
 import React, { memo, useRef, useState } from 'react';
 import { GoogleMap, useJsApiLoader, MarkerF } from '@react-google-maps/api';
 import shallow from 'zustand/shallow';
-import { FaInfoCircle, FaCrosshairs, FaParking } from 'react-icons/fa';
+import { FaInfoCircle, FaCrosshairs, FaParking, FaSpinner } from 'react-icons/fa';
 import useStore from '../../../store';
 import CustomMarker from './components/CustomMarker';
 import ParkingInfo from './components/ParkingInfo';
@@ -23,6 +23,7 @@ const Map = memo(() => {
   }, shallow);
 
   const [mapCenter, setMapCenter] = useState<google.maps.LatLngLiteral>(userCenter!);
+  const [clickCoord, setClickCoord] = useState<google.maps.LatLngLiteral>(userCenter!);
   const [activeMarker, setActiveMarker] = useState<string | null>(null);
   const [showParkingLotInfo, setShowParkingLotInfo] = useState<
     | (Park & {
@@ -31,7 +32,6 @@ const Map = memo(() => {
     | null
   >(null);
   const [showInfoBox, setShowInfoBox] = useState<boolean>(false);
-
   // 使用 useRef 綁定 DOM 設定地圖存放位置
   const mapRef = useRef<google.maps.Map | null>(null);
 
@@ -41,11 +41,11 @@ const Map = memo(() => {
     { name: '車位小於5', color: '#FF6600' },
     { name: '無車位', color: '#666666' },
   ];
-  // 點擊地圖取得點擊地點座標，並使用 panTo 將地圖移動至點擊地點。
+  // 點擊地圖取得點擊地點座標。
   const onMapClick = (e: google.maps.MapMouseEvent) => {
     if (e.latLng) {
       setActiveMarker(null);
-      setMapCenter({ lat: e.latLng.lat(), lng: e.latLng.lng() });
+      setClickCoord({ lat: e.latLng.lat(), lng: e.latLng.lng() });
     }
   };
 
@@ -64,11 +64,11 @@ const Map = memo(() => {
 
   // 取得點擊地點坐標附近停車場資料
   const aroundParkingLots: Array<Park> | undefined = parkingLots?.filter((parkingLot) => {
-    const twd97MapCenter = latlngToTwd97(mapCenter.lat, mapCenter.lng);
-    const top = twd97MapCenter.twd97x + 1000;
-    const bottom = twd97MapCenter.twd97x - 1000;
-    const left = twd97MapCenter.twd97y - 1000;
-    const right = twd97MapCenter.twd97y + 1000;
+    const twd97ClickCoord = latlngToTwd97(clickCoord.lat, clickCoord.lng);
+    const top = twd97ClickCoord.twd97x + 1000;
+    const bottom = twd97ClickCoord.twd97x - 1000;
+    const left = twd97ClickCoord.twd97y - 1000;
+    const right = twd97ClickCoord.twd97y + 1000;
     return (
       parseFloat(parkingLot.tw97x) < top &&
       parseFloat(parkingLot.tw97x) > bottom &&
@@ -86,19 +86,31 @@ const Map = memo(() => {
   });
 
   if (!isLoaded) {
-    return <div className="h-full w-full text-2xl flex-center">Map Loading...</div>;
+    return (
+      <div className="h-full w-full bg-light text-2xl flex-center">
+        <div className="animate-spin p-2 text-primary">
+          <FaSpinner />
+        </div>
+        <p className="text-primary">Map Loading...</p>
+      </div>
+    );
   }
 
   return (
     <div className="relative h-full w-full">
       {/* ----------Location Icon---------- */}
-      <div className="absolute top-4 right-4 z-[1] ">
-        <IconBtn onClick={() => mapRef.current?.panTo(userCenter!)}>
+      <div className="absolute top-4 right-4 z-[1] transition delay-150 duration-300 hover:-translate-y-1">
+        <IconBtn
+          onClick={() => {
+            mapRef.current?.panTo(userCenter!);
+            setClickCoord(userCenter!);
+          }}
+        >
           <FaCrosshairs size="1.6rem" color="blue" />
         </IconBtn>
       </div>
       {/* ----------InfoBox Icon---------- */}
-      <div className="absolute top-16 right-4 z-[1]">
+      <div className="absolute top-16 right-4 z-[1] transition delay-150 duration-300 hover:-translate-y-1">
         <IconBtn onClick={() => setShowInfoBox((pre) => !pre)}>
           <FaInfoCircle size="1.6rem" color="blue" />
         </IconBtn>
@@ -111,6 +123,7 @@ const Map = memo(() => {
         {infoArray.map((info) => {
           return (
             <div
+              key={info.name}
               className="flex items-center opacity-0 transition-opacity delay-150 data-active:opacity-100"
               data-active={showInfoBox}
             >
@@ -123,7 +136,7 @@ const Map = memo(() => {
       {/* ----------google map---------- */}
       <div className="h-full w-full">
         <GoogleMap
-          center={userCenter!} // 地圖中央座標
+          center={mapCenter!} // 地圖中央座標
           zoom={16} // 地圖縮放大小，數字越大越近
           mapContainerStyle={{ width: '100%', height: '100%' }} // 地圖大小
           options={{
@@ -140,6 +153,13 @@ const Map = memo(() => {
             mapRef.current = null;
           }}
           onClick={onMapClick}
+          onDragEnd={() => {
+            const latlng: google.maps.LatLng | undefined = mapRef.current?.getCenter();
+            if (latlng) {
+              setMapCenter({ lat: latlng?.lat(), lng: latlng.lng() });
+              setClickCoord({ lat: latlng?.lat(), lng: latlng.lng() });
+            }
+          }}
         >
           {/* ----------Markers---------- */}
           <MarkerF position={userCenter!} />
@@ -150,7 +170,7 @@ const Map = memo(() => {
                 parkingLot={parkingLot}
                 onSetActiveMarKer={setActiveMarker}
                 onHandleActiveMarker={handleActiveMarker}
-                onSetMapCenter={setMapCenter}
+                onSetClickCoord={setClickCoord}
               />
             );
           })}
