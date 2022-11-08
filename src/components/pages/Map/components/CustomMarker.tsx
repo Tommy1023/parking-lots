@@ -33,7 +33,7 @@ const CustomMarker = ({
     if (!parkingAvailable || parkingAvailable.availablecar < 0) return '#9fc6f5'; // 無法提供資料
     if (parkingAvailable.availablecar < 5 && parkingAvailable.availablecar > 0)
       return '#FF6600'; // 停車格小於5
-    if (parkingAvailable.availablecar === 0) return '#777777';
+    if (parkingAvailable.availablecar === 0) return '#666666';
     return 'blue';
   }, [parkingAvailable]);
 

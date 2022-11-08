@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { memo, useRef, useState } from 'react';
 import { GoogleMap, useJsApiLoader, MarkerF } from '@react-google-maps/api';
-import { GiAbstract103 } from 'react-icons/gi';
 import shallow from 'zustand/shallow';
+import { FaInfoCircle, FaCrosshairs, FaParking } from 'react-icons/fa';
 import useStore from '../../../store';
 import CustomMarker from './components/CustomMarker';
 import ParkingInfo from './components/ParkingInfo';
 import { latlngToTwd97 } from '../../../helpers/coordTransHelper';
 import { Park, AvailablePark } from '../../../types';
+import IconBtn from './components/IconBtn';
 
 const Map = memo(() => {
   const { isLoaded } = useJsApiLoader({
@@ -23,16 +24,23 @@ const Map = memo(() => {
 
   const [mapCenter, setMapCenter] = useState<google.maps.LatLngLiteral>(userCenter!);
   const [activeMarker, setActiveMarker] = useState<string | null>(null);
-  const [activeMarkerParkingLotInfo, setActiveMarkerParkingLotInfo] = useState<
+  const [showParkingLotInfo, setShowParkingLotInfo] = useState<
     | (Park & {
         parkingAvailable?: AvailablePark | undefined;
       })
     | null
   >(null);
+  const [showInfoBox, setShowInfoBox] = useState<boolean>(false);
 
   // 使用 useRef 綁定 DOM 設定地圖存放位置
   const mapRef = useRef<google.maps.Map | null>(null);
 
+  const infoArray = [
+    { name: '即時更新', color: 'blue' },
+    { name: '無即時資料', color: '#9fc6f5' },
+    { name: '車位小於5', color: '#FF6600' },
+    { name: '無車位', color: '#666666' },
+  ];
   // 點擊地圖取得點擊地點座標，並使用 panTo 將地圖移動至點擊地點。
   const onMapClick = (e: google.maps.MapMouseEvent) => {
     if (e.latLng) {
@@ -41,7 +49,7 @@ const Map = memo(() => {
     }
   };
 
-  // infoWindow 開關，判斷被點擊的 marker
+  // Parking InfoWindow 開關，判斷被點擊的 marker
   const handleActiveMarker = (
     marker: string | null,
     ParkingLot: Park & {
@@ -50,7 +58,7 @@ const Map = memo(() => {
   ) => {
     if (marker !== activeMarker) {
       setActiveMarker(marker);
-      setActiveMarkerParkingLotInfo(ParkingLot);
+      setShowParkingLotInfo(ParkingLot);
     }
   };
 
@@ -83,15 +91,36 @@ const Map = memo(() => {
 
   return (
     <div className="relative h-full w-full">
-      {/* Location Icon */}
-      <button
-        className="absolute top-4 right-4 z-[1] rounded-full border-2 border-primary bg-light p-1 shadow-md shadow-slate-400"
-        onClick={() => mapRef.current?.panTo(userCenter!)}
+      {/* ----------Location Icon---------- */}
+      <div className="absolute top-4 right-4 z-[1] ">
+        <IconBtn onClick={() => mapRef.current?.panTo(userCenter!)}>
+          <FaCrosshairs size="1.6rem" color="blue" />
+        </IconBtn>
+      </div>
+      {/* ----------InfoBox Icon---------- */}
+      <div className="absolute top-16 right-4 z-[1]">
+        <IconBtn onClick={() => setShowInfoBox((pre) => !pre)}>
+          <FaInfoCircle size="1.6rem" color="blue" />
+        </IconBtn>
+      </div>
+      {/* ----------InfoBox---------- */}
+      <div
+        className=" absolute top-28 right-4 z-[1] origin-top scale-y-0 rounded-md border-2 border-slate-400 bg-light p-2 shadow-md shadow-slate-400 transition-transform data-active:scale-100"
+        data-active={showInfoBox}
       >
-        <GiAbstract103 size="1.6rem" color="blue" />
-      </button>
-
-      {/* google map */}
+        {infoArray.map((info) => {
+          return (
+            <div
+              className="flex items-center opacity-0 transition-opacity delay-150 data-active:opacity-100"
+              data-active={showInfoBox}
+            >
+              <FaParking size="1.5rem" color={info.color} />
+              <div className="ml-1">{info.name}</div>
+            </div>
+          );
+        })}
+      </div>
+      {/* ----------google map---------- */}
       <div className="h-full w-full">
         <GoogleMap
           center={userCenter!} // 地圖中央座標
@@ -112,6 +141,7 @@ const Map = memo(() => {
           }}
           onClick={onMapClick}
         >
+          {/* ----------Markers---------- */}
           <MarkerF position={userCenter!} />
           {aroundParkingLotWithAvailable?.map((parkingLot) => {
             return (
@@ -124,9 +154,10 @@ const Map = memo(() => {
               />
             );
           })}
-          {activeMarker && activeMarkerParkingLotInfo && (
+          {/* ----------ParkingInfo---------- */}
+          {activeMarker && showParkingLotInfo && (
             <div className=" absolute bottom-0 left-1/2 max-h-[40%] w-full -translate-x-1/2 overflow-y-scroll rounded-t-2xl p-1 md:top-0 md:left-0 md:max-h-full md:w-[30%] md:-translate-x-0">
-              <ParkingInfo origin={userCenter!} parkingLot={activeMarkerParkingLotInfo} />
+              <ParkingInfo origin={userCenter!} parkingLot={showParkingLotInfo} />
             </div>
           )}
         </GoogleMap>
