@@ -6,7 +6,6 @@ export type State = {
   allAvailable: Array<AvailablePark> | null;
   userCenter: google.maps.LatLngLiteral | null;
   mapCenter: google.maps.LatLngLiteral | null;
-  watchId: number | null;
 };
 
 export type Action = {

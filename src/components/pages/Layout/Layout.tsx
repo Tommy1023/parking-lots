@@ -19,21 +19,23 @@ const Home = () => {
         </IsLoading>
       </div>
       <div className={style.root}>
-        <NavLink to="map">
-          <FaMapMarkedAlt className={style.icon} />
-        </NavLink>
-        <NavLink to="parkingList">
-          <FaThList className={style.icon} />
-        </NavLink>
-        <NavLink to="keeps">
-          <FaRegBookmark className={style.icon} />
-        </NavLink>
-        <NavLink to="user">
-          <FaUserAlt className={style.icon} />
-        </NavLink>
-        <NavLink to="setting">
-          <FaWhmcs className={style.icon} />
-        </NavLink>
+        <div className="flex h-full items-center justify-evenly rounded-t-lg border-2 bg-light">
+          <NavLink to="map">
+            <FaMapMarkedAlt className="icon h-8 w-8 text-[#bae6fd] transition delay-150  duration-300 hover:-translate-y-3 hover:text-primary" />
+          </NavLink>
+          <NavLink to="parkingList">
+            <FaThList className="icon h-8 w-8 text-[#bae6fd] transition delay-150 duration-300 hover:-translate-y-3 hover:text-primary" />
+          </NavLink>
+          <NavLink to="keeps">
+            <FaRegBookmark className="icon h-8 w-8 text-[#bae6fd] transition delay-150 duration-300 hover:-translate-y-3 hover:text-primary" />
+          </NavLink>
+          <NavLink to="user">
+            <FaUserAlt className="icon h-8 w-8 text-[#bae6fd] transition delay-150 duration-300 hover:-translate-y-3 hover:text-primary" />
+          </NavLink>
+          <NavLink to="setting">
+            <FaWhmcs className="icon h-8 w-8 text-[#bae6fd] transition delay-150 duration-300 hover:-translate-y-3 hover:text-primary" />
+          </NavLink>
+        </div>
       </div>
     </div>
   );

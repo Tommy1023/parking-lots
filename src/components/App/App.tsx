@@ -2,15 +2,15 @@ import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import shallow from 'zustand/shallow';
 import useStore from '../../store';
+import Home from '../pages/Home';
 import Layout from '../pages/Layout';
 import Map from '../pages/Map';
 import List from '../pages/List';
 
 const App = () => {
-  const { init, isAppInitializedComplete } = useStore((state) => {
+  const { init } = useStore((state) => {
     return {
       init: state.init,
-      isAppInitializedComplete: state.isAppInitializedComplete,
     };
   }, shallow);
 
@@ -18,17 +18,12 @@ const App = () => {
     init();
   }, []);//eslint-disable-line
 
-  if (!isAppInitializedComplete)
-    return (
-      <div className="h-screen w-screen bg-[#FF6600] text-2xl  flex-center">
-        應用程式初使化中...
-      </div>
-    );
   return (
     <div>
       <Router basename="parking-lots">
         <Routes>
-          <Route path="/" element={<Layout />}>
+          <Route path="/" element={<Home />} />
+          <Route element={<Layout />}>
             <Route path="map" element={<Map />} />
             <Route path="parkingList" element={<List />} />
             <Route

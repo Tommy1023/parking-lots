@@ -1,15 +1,11 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { memo, useRef, useState, useEffect } from 'react';
-import {
-  GoogleMap,
-  useJsApiLoader,
-  MarkerF,
-  // DistanceMatrixService,
-} from '@react-google-maps/api';
+import React, { memo, useRef, useState } from 'react';
+import { GoogleMap, useJsApiLoader, MarkerF } from '@react-google-maps/api';
 import { GiAbstract103 } from 'react-icons/gi';
 import shallow from 'zustand/shallow';
 import useStore from '../../../store';
 import CustomMarker from './components/CustomMarker';
+import ParkingInfo from './components/ParkingInfo';
 import { latlngToTwd97 } from '../../../helpers/coordTransHelper';
 import { Park, AvailablePark } from '../../../types';
 
@@ -17,17 +13,23 @@ const Map = memo(() => {
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_API_KEY!,
   });
-  const { parkingLots, userCenter, watchId, allAvailable } = useStore((state) => {
+  const { parkingLots, userCenter, allAvailable } = useStore((state) => {
     return {
       parkingLots: state.parkingLots,
       userCenter: state.userCenter,
-      watchId: state.watchId,
       allAvailable: state.allAvailable,
     };
   }, shallow);
 
   const [mapCenter, setMapCenter] = useState<google.maps.LatLngLiteral>(userCenter!);
   const [activeMarker, setActiveMarker] = useState<string | null>(null);
+  const [activeMarkerParkingLotInfo, setActiveMarkerParkingLotInfo] = useState<
+    | (Park & {
+        parkingAvailable?: AvailablePark | undefined;
+      })
+    | null
+  >(null);
+
   // 使用 useRef 綁定 DOM 設定地圖存放位置
   const mapRef = useRef<google.maps.Map | null>(null);
 
@@ -40,8 +42,16 @@ const Map = memo(() => {
   };
 
   // infoWindow 開關，判斷被點擊的 marker
-  const handleActiveMarker = (marker: string | null) => {
-    if (marker !== activeMarker) setActiveMarker(marker);
+  const handleActiveMarker = (
+    marker: string | null,
+    ParkingLot: Park & {
+      parkingAvailable?: AvailablePark | undefined;
+    },
+  ) => {
+    if (marker !== activeMarker) {
+      setActiveMarker(marker);
+      setActiveMarkerParkingLotInfo(ParkingLot);
+    }
   };
 
   // 取得點擊地點坐標附近停車場資料
@@ -67,13 +77,6 @@ const Map = memo(() => {
     return { ...parkingLot, parkingAvailable: parkingAvailable?.[0] };
   });
 
-  useEffect(() => {
-    return () => {
-      if (watchId) {
-        navigator.geolocation.clearWatch(watchId);
-      }
-    };
-  });
   if (!isLoaded) {
     return <div className="h-full w-full text-2xl flex-center">Map Loading...</div>;
   }
@@ -81,19 +84,17 @@ const Map = memo(() => {
   return (
     <div className="relative h-full w-full">
       {/* Location Icon */}
-      <div className=" absolute bottom-5 right-2 z-[1]">
-        <button
-          className="rounded-full border-2 bg-gray-300 p-1 shadow-md shadow-slate-400"
-          onClick={() => mapRef.current?.panTo(userCenter!)}
-        >
-          <GiAbstract103 size="2rem" />
-        </button>
-      </div>
+      <button
+        className="absolute top-4 right-4 z-[1] rounded-full border-2 border-primary bg-light p-1 shadow-md shadow-slate-400"
+        onClick={() => mapRef.current?.panTo(userCenter!)}
+      >
+        <GiAbstract103 size="1.6rem" color="blue" />
+      </button>
 
       {/* google map */}
       <div className="h-full w-full">
         <GoogleMap
-          center={mapCenter} // 地圖中央座標
+          center={userCenter!} // 地圖中央座標
           zoom={16} // 地圖縮放大小，數字越大越近
           mapContainerStyle={{ width: '100%', height: '100%' }} // 地圖大小
           options={{
@@ -111,21 +112,23 @@ const Map = memo(() => {
           }}
           onClick={onMapClick}
         >
-          {/* TODO 停車場入口 */}
           <MarkerF position={userCenter!} />
           {aroundParkingLotWithAvailable?.map((parkingLot) => {
             return (
               <CustomMarker
                 key={parkingLot.id}
                 parkingLot={parkingLot}
-                userCenter={userCenter}
-                activeMarker={activeMarker}
                 onSetActiveMarKer={setActiveMarker}
                 onHandleActiveMarker={handleActiveMarker}
                 onSetMapCenter={setMapCenter}
               />
             );
           })}
+          {activeMarker && activeMarkerParkingLotInfo && (
+            <div className=" absolute bottom-0 left-1/2 max-h-[40%] w-full -translate-x-1/2 overflow-y-scroll rounded-t-2xl p-1 md:top-0 md:left-0 md:max-h-full md:w-[30%] md:-translate-x-0">
+              <ParkingInfo origin={userCenter!} parkingLot={activeMarkerParkingLotInfo} />
+            </div>
+          )}
         </GoogleMap>
       </div>
     </div>

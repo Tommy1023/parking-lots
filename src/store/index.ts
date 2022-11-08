@@ -1,5 +1,3 @@
-/* eslint-disable no-alert */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import create from 'zustand';
 import { fetchAllAvailable, fetchParkingLots } from '../service/parkingLotsApi';
 import { State, Action } from '../types';
@@ -11,7 +9,6 @@ const initialize: State = {
   allAvailable: [],
   userCenter: null,
   mapCenter: null,
-  watchId: null,
 };
 
 const useStore = create<State & Action>((set) => {
@@ -21,19 +18,20 @@ const useStore = create<State & Action>((set) => {
 
     // actions
     async init() {
+      console.log('App Initialized Start');
       // 取得使用者定位
       try {
         // 確認 browser 是否有支援
         if (!navigator.geolocation) {
+          // eslint-disable-next-line no-alert
           alert('Geolocation is not supported by your browser');
         } else {
-          const watchId = navigator.geolocation.watchPosition((position) => {
+          navigator.geolocation.getCurrentPosition((position) => {
             set({
               userCenter: {
                 lat: position.coords.latitude,
                 lng: position.coords.longitude,
               },
-              watchId,
             });
           });
         }
@@ -58,9 +56,8 @@ const useStore = create<State & Action>((set) => {
       } catch (error) {
         console.log('getAllAvailable error:', error);
       }
-      setTimeout(() => {
-        set({ isAppInitializedComplete: true });
-      }, 5000);
+      set({ isAppInitializedComplete: true });
+      console.log('App Initialized Complete');
     },
     updateParkingLots() {
       set({ isLoading: true });

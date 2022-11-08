@@ -1,18 +1,12 @@
 .root {
   height: 10%;
-  display: flex;
-  align-items: center;
-  justify-content: space-evenly;
-  border-top-left-radius: 0.5rem;
-  border-top-right-radius: 00.5rem;
-  border-width: 2px;
-  background-color: rgb(245 248 259);
-  .icon{
-    width: 2rem;
-    height: 2rem;
-    color: #FF6600;
-  }
-  &:active {
-    color: black;
+  :global{
+    .active {
+      .icon {
+        color: #0062ff;
+      }
+    }
   }
 }
+
+  

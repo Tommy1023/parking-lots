@@ -1,33 +1,33 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { memo, useRef, useState, useCallback } from 'react';
-import { MarkerF, InfoWindowF, DistanceMatrixService } from '@react-google-maps/api';
-import { Park, AvailablePark, DistanceAndDuration } from '../../../../types';
+import React, { memo, useRef, useCallback } from 'react';
+import { MarkerF } from '@react-google-maps/api';
+import { Park, AvailablePark } from '../../../../types';
 import { twd97ToLatlng } from '../../../../helpers/coordTransHelper';
-import ParkingInfo from './ParkingInfo';
+
+type CustomMarkerProp = {
+  parkingLot: Park & { parkingAvailable?: AvailablePark | undefined };
+  onSetActiveMarKer: (id: string | null) => void;
+  onHandleActiveMarker: (
+    id: string | null,
+    ParkingLot: Park & {
+      parkingAvailable?: AvailablePark | undefined;
+    },
+  ) => void;
+  onSetMapCenter: ({ lat, lng }: { lat: number; lng: number }) => void;
+};
 
 const CustomMarker = ({
-  userCenter,
   parkingLot,
-  activeMarker,
   onSetActiveMarKer,
   onHandleActiveMarker,
   onSetMapCenter,
-}: {
-  userCenter: google.maps.LatLngLiteral | null;
-  parkingLot: Park & { parkingAvailable?: AvailablePark | undefined };
-  activeMarker: string | null;
-  onSetActiveMarKer: (id: string | null) => void;
-  onHandleActiveMarker: (id: string | null) => void;
-  onSetMapCenter: ({ lat, lng }: { lat: number; lng: number }) => void;
-}) => {
+}: CustomMarkerProp) => {
   const { id, tw97x, tw97y, parkingAvailable } = parkingLot;
   const numTw97x = useRef<number>(parseFloat(tw97x!));
   const numTw97y = useRef<number>(parseFloat(tw97y!));
   const transPosition = useRef<google.maps.LatLngLiteral>(
     twd97ToLatlng(numTw97x.current, numTw97y.current),
   );
-  const [distanceAndDuration, setDistanceAndDuration] =
-    useState<DistanceAndDuration | null>(null);
 
   const markerColor = useCallback(() => {
     if (!parkingAvailable || parkingAvailable.availablecar < 0) return '#9fc6f5'; // 無法提供資料
@@ -45,41 +45,15 @@ const CustomMarker = ({
         fillColor: `${markerColor()}`,
         fillOpacity: 0.9,
         scale: 0.07,
-        // strokeColor: 'blue',
+        strokeColor: null,
         strokeWeight: 1,
       }}
       position={transPosition.current}
       onClick={() => {
-        onHandleActiveMarker(id);
+        onHandleActiveMarker(id, parkingLot);
         onSetMapCenter(transPosition.current);
       }}
-    >
-      {activeMarker === id && (
-        <>
-          <InfoWindowF
-            position={transPosition.current}
-            onCloseClick={() => onSetActiveMarKer(null)}
-          >
-            <ParkingInfo
-              parkingLot={parkingLot}
-              origin={userCenter!}
-              distanceAndDuration={distanceAndDuration}
-            />
-          </InfoWindowF>
-          {/* 記算所在地與目的地的距離與行車時間 */}
-          <DistanceMatrixService
-            options={{
-              destinations: [transPosition.current], // 上限25個
-              origins: [userCenter!],
-              travelMode: google.maps.TravelMode.DRIVING,
-            }}
-            callback={(response) => {
-              if (response) setDistanceAndDuration(response?.rows[0].elements[0]);
-            }}
-          />
-        </>
-      )}
-    </MarkerF>
+    />
   );
 };
 
