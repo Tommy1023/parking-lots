@@ -6,12 +6,22 @@ export type State = {
   allAvailable: Array<AvailablePark> | null;
   userCenter: google.maps.LatLngLiteral | null;
   mapCenter: google.maps.LatLngLiteral | null;
+  aroundParkingLotWithAvailable:
+    | (Array<Park> & {
+        parkingAvailable?: AvailablePark;
+      })
+    | null;
 };
 
 export type Action = {
   init: () => void;
   updateParkingLots: () => void;
   updateAllAvailable: () => void;
+  getAroundParkingLotsWithAvailable: (
+    parkingLots: Park[],
+    clickCoord: google.maps.LatLngLiteral,
+    allAvailable: AvailablePark[] | null,
+  ) => void;
 };
 
 export type Park = {

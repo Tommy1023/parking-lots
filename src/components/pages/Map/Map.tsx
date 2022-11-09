@@ -1,27 +1,37 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { memo, useRef, useState } from 'react';
+import React, { memo, useRef, useState, useEffect } from 'react';
 import { GoogleMap, useJsApiLoader, MarkerF } from '@react-google-maps/api';
 import shallow from 'zustand/shallow';
 import { FaInfoCircle, FaCrosshairs, FaParking, FaSpinner } from 'react-icons/fa';
 import useStore from '../../../store';
 import CustomMarker from './components/CustomMarker';
 import ParkingInfo from './components/ParkingInfo';
-import { latlngToTwd97 } from '../../../helpers/coordTransHelper';
 import { Park, AvailablePark } from '../../../types';
 import IconBtn from './components/IconBtn';
+import parkingIconState from './parkingIconState.json';
 
 const Map = memo(() => {
+  // -------------------------- Hooks --------------------------
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_API_KEY!,
   });
-  const { parkingLots, userCenter, allAvailable } = useStore((state) => {
+  const {
+    parkingLots,
+    userCenter,
+    allAvailable,
+    getAroundParkingLotsWithAvailable,
+    aroundParkingLotWithAvailable,
+  } = useStore((state) => {
     return {
       parkingLots: state.parkingLots,
       userCenter: state.userCenter,
       allAvailable: state.allAvailable,
+      getAroundParkingLotsWithAvailable: state.getAroundParkingLotsWithAvailable,
+      aroundParkingLotWithAvailable: state.aroundParkingLotWithAvailable,
     };
   }, shallow);
 
+  // -------------------------- States --------------------------
   const [mapCenter, setMapCenter] = useState<google.maps.LatLngLiteral>(userCenter!);
   const [clickCoord, setClickCoord] = useState<google.maps.LatLngLiteral>(userCenter!);
   const [activeMarker, setActiveMarker] = useState<string | null>(null);
@@ -35,12 +45,7 @@ const Map = memo(() => {
   // 使用 useRef 綁定 DOM 設定地圖存放位置
   const mapRef = useRef<google.maps.Map | null>(null);
 
-  const infoArray = [
-    { name: '即時更新', color: 'blue' },
-    { name: '無即時資料', color: '#9fc6f5' },
-    { name: '車位小於5', color: '#FF6600' },
-    { name: '無車位', color: '#666666' },
-  ];
+  // -------------------------- Actions --------------------------
   // 點擊地圖取得點擊地點座標。
   const onMapClick = (e: google.maps.MapMouseEvent) => {
     if (e.latLng) {
@@ -61,29 +66,12 @@ const Map = memo(() => {
       setShowParkingLotInfo(ParkingLot);
     }
   };
-
-  // 取得點擊地點坐標附近停車場資料
-  const aroundParkingLots: Array<Park> | undefined = parkingLots?.filter((parkingLot) => {
-    const twd97ClickCoord = latlngToTwd97(clickCoord.lat, clickCoord.lng);
-    const top = twd97ClickCoord.twd97x + 1000;
-    const bottom = twd97ClickCoord.twd97x - 1000;
-    const left = twd97ClickCoord.twd97y - 1000;
-    const right = twd97ClickCoord.twd97y + 1000;
-    return (
-      parseFloat(parkingLot.tw97x) < top &&
-      parseFloat(parkingLot.tw97x) > bottom &&
-      parseFloat(parkingLot.tw97y) > left &&
-      parseFloat(parkingLot.tw97y) < right
-    );
-  });
-  const aroundParkingLotWithAvailable: Array<Park> & {
-    parkingAvailable?: AvailablePark | undefined;
-  } = aroundParkingLots!.map((parkingLot) => {
-    const parkingAvailable = allAvailable?.filter((available) => {
-      return available.id === parkingLot.id;
-    });
-    return { ...parkingLot, parkingAvailable: parkingAvailable?.[0] };
-  });
+  // ------------------------- useEffect -------------------------
+  useEffect(() => {
+    // 取得點擊地點坐標附近停車場資料
+    if (!parkingLots || !clickCoord || !allAvailable) return;
+    getAroundParkingLotsWithAvailable(parkingLots, clickCoord, allAvailable);
+  }, [parkingLots, clickCoord, allAvailable, getAroundParkingLotsWithAvailable]);
 
   if (!isLoaded) {
     return (
@@ -95,7 +83,7 @@ const Map = memo(() => {
       </div>
     );
   }
-
+  // -------------------------- JSX --------------------------
   return (
     <div className="relative h-full w-full">
       {/* ----------Location Icon---------- */}
@@ -120,7 +108,7 @@ const Map = memo(() => {
         className=" absolute top-28 right-4 z-[1] origin-top scale-y-0 rounded-md border-2 border-slate-400 bg-light p-2 shadow-md shadow-slate-400 transition-transform data-active:scale-100"
         data-active={showInfoBox}
       >
-        {infoArray.map((info) => {
+        {parkingIconState.map((info) => {
           return (
             <div
               key={info.name}

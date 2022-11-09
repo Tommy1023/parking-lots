@@ -1,7 +1,8 @@
 /* eslint-disable no-alert */
 import create from 'zustand';
 import { fetchAllAvailable, fetchParkingLots } from '../service/parkingLotsApi';
-import { State, Action } from '../types';
+import { State, Action, Park, AvailablePark } from '../types';
+import { latlngToTwd97 } from '../helpers/coordTransHelper';
 
 const initialize: State = {
   isAppInitializedComplete: false,
@@ -10,6 +11,7 @@ const initialize: State = {
   allAvailable: [],
   userCenter: null,
   mapCenter: null,
+  aroundParkingLotWithAvailable: null,
 };
 
 const useStore = create<State & Action>((set) => {
@@ -92,6 +94,32 @@ const useStore = create<State & Action>((set) => {
         .finally(() => {
           set({ isLoading: false });
         });
+    },
+    getAroundParkingLotsWithAvailable(parkingLots, clickCoord, allAvailable) {
+      if (!parkingLots || !clickCoord) return;
+      const aroundParkingLots: Array<Park> = parkingLots.filter((parkingLot) => {
+        const twd97ClickCoord = latlngToTwd97(clickCoord.lat, clickCoord.lng);
+        const top = twd97ClickCoord.twd97x + 1000;
+        const bottom = twd97ClickCoord.twd97x - 1000;
+        const left = twd97ClickCoord.twd97y - 1000;
+        const right = twd97ClickCoord.twd97y + 1000;
+        return (
+          parseFloat(parkingLot.tw97x) < top &&
+          parseFloat(parkingLot.tw97x) > bottom &&
+          parseFloat(parkingLot.tw97y) > left &&
+          parseFloat(parkingLot.tw97y) < right
+        );
+      });
+      if (!aroundParkingLots) return;
+      const aroundParkingLotWithAvailable: Array<Park> & {
+        parkingAvailable?: AvailablePark;
+      } = aroundParkingLots.map((parkingLot) => {
+        const parkingAvailable = allAvailable?.filter((available) => {
+          return available.id === parkingLot.id;
+        });
+        return { ...parkingLot, parkingAvailable: parkingAvailable?.[0] };
+      });
+      set({ aroundParkingLotWithAvailable });
     },
   };
 });
