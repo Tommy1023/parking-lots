@@ -50,6 +50,7 @@ const Map = memo(() => {
   const onMapClick = (e: google.maps.MapMouseEvent) => {
     if (e.latLng) {
       setActiveMarker(null);
+      setShowParkingLotInfo(null);
       setClickCoord({ lat: e.latLng.lat(), lng: e.latLng.lng() });
     }
   };
@@ -66,6 +67,7 @@ const Map = memo(() => {
       setShowParkingLotInfo(ParkingLot);
     }
   };
+
   // ------------------------- useEffect -------------------------
   useEffect(() => {
     // 取得點擊地點坐標附近停車場資料
@@ -163,9 +165,9 @@ const Map = memo(() => {
             );
           })}
           {/* ----------ParkingInfo---------- */}
-          {activeMarker && showParkingLotInfo && (
+          {userCenter && showParkingLotInfo && (
             <div className=" absolute bottom-0 left-1/2 max-h-[40%] w-full -translate-x-1/2 overflow-y-scroll rounded-t-2xl p-1 md:top-0 md:left-0 md:max-h-full md:w-[30%] md:-translate-x-0">
-              <ParkingInfo origin={userCenter!} parkingLot={showParkingLotInfo} />
+              <ParkingInfo origin={userCenter} parkingLot={showParkingLotInfo} />
             </div>
           )}
         </GoogleMap>

@@ -88,14 +88,3 @@ export type ScoketStatusList = {
   spot_abrv: string;
   spot_status: string;
 };
-
-export type DistanceAndDuration = {
-  distance: {
-    text: string;
-    value: number;
-  };
-  duration: {
-    text: string;
-    value: number;
-  };
-};
