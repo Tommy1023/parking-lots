@@ -1,9 +1,9 @@
 /* eslint-disable camelcase */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { memo, useState, useEffect, useCallback } from 'react';
-import { Park, AvailablePark } from '../../../../types';
-import InfoBar from '../../../InfoBar';
-import { twd97ToLatlng } from '../../../../helpers/coordTransHelper';
+import { Park, AvailablePark } from '../../../types';
+import InfoBar from '../../../components/InfoBar';
+import { twd97ToLatlng } from '../../../helpers/coordTransHelper';
 
 type ParkingInfoProp = {
   origin: google.maps.LatLngLiteral;

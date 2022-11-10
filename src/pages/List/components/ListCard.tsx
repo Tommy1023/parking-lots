@@ -10,9 +10,9 @@ import {
 } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import shallow from 'zustand/shallow';
-import { ParkingLotsWithAvailable } from '../../../../types';
-import useStore from '../../../../store';
-import InfoBar from '../../../InfoBar';
+import { ParkingLotsWithAvailable } from '../../../types';
+import useStore from '../../../store';
+import InfoBar from '../../../components/InfoBar';
 
 const ListCard = memo(({ parkingLot }: { parkingLot: ParkingLotsWithAvailable }) => {
   const {

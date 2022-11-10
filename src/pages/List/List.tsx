@@ -2,10 +2,10 @@ import React, { memo, useState, useEffect, useCallback } from 'react';
 import shallow from 'zustand/shallow';
 import { useForm } from 'react-hook-form';
 import { FaSearch, FaEraser } from 'react-icons/fa';
-import useStore from '../../../store';
+import useStore from '../../store';
 import ListCard from './components/ListCard';
 import TAIPEIAREAS from './taipeiArea.json';
-import { Park } from '../../../types';
+import { Park } from '../../types';
 
 type FormValues = {
   area: string;

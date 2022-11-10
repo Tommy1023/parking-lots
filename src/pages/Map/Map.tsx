@@ -10,13 +10,13 @@ import {
   FaWheelchair,
   FaBabyCarriage,
 } from 'react-icons/fa';
-import useStore from '../../../store';
+import useStore from '../../store';
 import CustomMarker from './components/CustomMarker';
 import ParkingInfo from './components/ParkingInfo';
-import { Park, AvailablePark } from '../../../types';
+import { Park, AvailablePark } from '../../types';
 import IconBtn from './components/IconBtn';
 import parkingIconState from './parkingIconState.json';
-import InfoItem from '../../InfoItem/InfoItem';
+import InfoItem from '../../components/InfoItem/InfoItem';
 import parkingType from './parkingType.json';
 
 const Map = memo(() => {

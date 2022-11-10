@@ -78,29 +78,22 @@ const useStore = create<State & Action>((set) => {
       console.log('App Initialized Complete');
     },
     updateParkingLots() {
-      set({ isLoading: true });
       fetchParkingLots()
         .then((res) => {
           if (res.statusText === 'OK') set({ parkingLots: res.data.data.park });
         })
         .catch((err) => {
           console.log('updateParkingLots error:', err);
-        })
-        .finally(() => {
-          set({ isLoading: false });
         });
     },
     updateAllAvailable() {
-      set({ isLoading: true });
+      console.log('update');
       fetchAllAvailable()
         .then((res) => {
           if (res.statusText === 'OK') set({ allAvailable: res.data.data.park });
         })
         .catch((err) => {
           console.log('updateAllAvailable error:', err);
-        })
-        .finally(() => {
-          set({ isLoading: false });
         });
     },
     getAroundParkingLotsWithAvailable(parkingLots, clickCoord, allAvailable) {

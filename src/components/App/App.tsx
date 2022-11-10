@@ -3,10 +3,10 @@ import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import shallow from 'zustand/shallow';
 import useStore from '../../store';
-import Home from '../pages/Home';
-import Layout from '../pages/Layout';
-import Map from '../pages/Map';
-import List from '../pages/List';
+import Home from '../../pages/Home';
+import Layout from '../../pages/Layout';
+import Map from '../../pages/Map';
+import List from '../../pages/List';
 
 const App = () => {
   const { init, updateAllAvailable } = useStore((state) => {

@@ -2,7 +2,7 @@ import React, { memo } from 'react';
 import { Link } from 'react-router-dom';
 import { FaMapMarkerAlt } from 'react-icons/fa';
 import shallow from 'zustand/shallow';
-import useStore from '../../../store';
+import useStore from '../../store';
 
 const Home = memo(() => {
   const { isAppInitializedComplete } = useStore((state) => {
@@ -27,9 +27,12 @@ const Home = memo(() => {
           開始使用
         </Link>
       ) : (
-        <div className="mb-4 mt-auto flex w-[60%] justify-center rounded-xl bg-primary p-2 text-light">
+        <button
+          className="mb-4 mt-auto flex w-[60%] justify-center rounded-xl bg-primary p-2 text-light"
+          disabled={isAppInitializedComplete}
+        >
           應用程式初使化中
-        </div>
+        </button>
       )}
     </div>
   );
