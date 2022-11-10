@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { memo, useRef, useState, useEffect } from 'react';
+import React, { memo, useState, useEffect } from 'react';
 import { GoogleMap, useJsApiLoader, MarkerF } from '@react-google-maps/api';
 import shallow from 'zustand/shallow';
 import {
@@ -18,13 +18,19 @@ import IconBtn from './components/IconBtn';
 import parkingIconState from './parkingIconState.json';
 import InfoItem from '../../components/InfoItem/InfoItem';
 import parkingType from './parkingType.json';
+import SearchBar from './components/SearchBar';
+
+type Libraries = ('drawing' | 'geometry' | 'localContext' | 'places')[];
+const libraries: Libraries = ['places'];
 
 const Map = memo(() => {
   // -------------------------- Hooks --------------------------
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_API_KEY!,
+    libraries,
   });
   const {
+    googleMap,
     parkingLots,
     userCenter,
     mapCenter,
@@ -33,10 +39,13 @@ const Map = memo(() => {
     getAroundParkingLotsWithAvailable,
     aroundParkingLotWithAvailable,
     filterMarker,
+    setGoogleMap,
     setClickCoord,
     setMapCenter,
+    searchMarker,
   } = useStore((state) => {
     return {
+      googleMap: state.googleMap,
       parkingLots: state.parkingLots,
       userCenter: state.userCenter,
       mapCenter: state.mapCenter,
@@ -45,8 +54,10 @@ const Map = memo(() => {
       getAroundParkingLotsWithAvailable: state.getAroundParkingLotsWithAvailable,
       aroundParkingLotWithAvailable: state.aroundParkingLotWithAvailable,
       filterMarker: state.filterMarker,
+      setGoogleMap: state.setGoogleMap,
       setClickCoord: state.setClickCoord,
       setMapCenter: state.setMapCenter,
+      searchMarker: state.searchMarker,
     };
   }, shallow);
 
@@ -60,7 +71,7 @@ const Map = memo(() => {
   >(null);
   const [showInfoBox, setShowInfoBox] = useState<boolean>(false);
   // 使用 useRef 綁定 DOM 設定地圖存放位置
-  const mapRef = useRef<google.maps.Map | null>(null);
+  // const mapRef = useRef<google.maps.Map | null>(null);
 
   // -------------------------- Actions --------------------------
   // 點擊地圖取得點擊地點座標。
@@ -110,7 +121,7 @@ const Map = memo(() => {
       <div className="absolute top-4 right-4 z-[1] transition delay-150 duration-300 hover:-translate-y-1">
         <IconBtn
           onClick={() => {
-            mapRef.current?.panTo(userCenter!);
+            googleMap?.panTo(userCenter!);
           }}
         >
           <FaCrosshairs size="1.6rem" color="blue" />
@@ -178,23 +189,31 @@ const Map = memo(() => {
             zoomControl: false,
           }}
           onLoad={(map: google.maps.Map): void => {
-            mapRef.current = map;
+            setGoogleMap(map);
           }}
           onUnmount={(): void => {
-            mapRef.current = null;
+            setGoogleMap(null);
           }}
           onClick={onMapClick}
           onDragEnd={() => {
-            const latlng: google.maps.LatLng | undefined = mapRef.current?.getCenter();
+            const latlng: google.maps.LatLng | undefined = googleMap?.getCenter();
             if (latlng) {
               setMapCenter({ lat: latlng?.lat(), lng: latlng.lng() });
               setClickCoord({ lat: latlng?.lat(), lng: latlng.lng() });
             }
           }}
         >
+          {/* ----------SearchBar---------- */}
+          <div
+            className="absolute top-3 left-[50%] w-[70%] -translate-x-[50%] md:w-[50%] md:data-active:left-[60%]"
+            data-active={!!showParkingLotInfo}
+          >
+            <SearchBar />
+          </div>
           {/* ----------Markers---------- */}
           <MarkerF position={userCenter!} />
           {filterMarker && <MarkerF position={filterMarker} />}
+          {searchMarker && <MarkerF position={searchMarker} />}
           {aroundParkingLotWithAvailable?.map((parkingLot) => {
             return (
               <CustomMarker

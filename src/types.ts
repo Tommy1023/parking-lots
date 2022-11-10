@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export type State = {
   isAppInitializedComplete: boolean;
+  googleMap: google.maps.Map | null;
   isLoading: boolean;
   parkingLots: Array<Park>;
   allAvailable: Array<AvailablePark>;
@@ -12,6 +13,7 @@ export type State = {
   parkingLotsWithAvailable: Array<ParkingLotsWithAvailable>;
   area: string;
   keywords: string;
+  searchMarker: google.maps.LatLngLiteral | null;
 };
 
 export type ParkingLotsWithAvailable = Park & {
@@ -36,11 +38,13 @@ export type Action = {
     tw97y: string,
     parkingLotsWithAvailable: ParkingLotsWithAvailable[],
   ) => void;
+  setGoogleMap: (map: google.maps.Map | null) => void;
   setClickCoord: (latlng: google.maps.LatLngLiteral | null) => void;
   setFilterMarker: (latlng: google.maps.LatLngLiteral | null) => void;
   setMapCenter: (latlng: google.maps.LatLngLiteral | null) => void;
   setArea: (area: string) => void;
   setKeywords: (keywords: string) => void;
+  setSearchMarker: (latlng: google.maps.LatLngLiteral | null) => void;
 };
 
 export type Park = {

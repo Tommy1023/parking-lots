@@ -7,6 +7,7 @@ import { latlngToTwd97, twd97ToLatlng } from '../helpers/coordTransHelper';
 const initialize: State = {
   isAppInitializedComplete: false,
   isLoading: false,
+  googleMap: null,
   parkingLots: [],
   allAvailable: [],
   userCenter: null,
@@ -17,6 +18,7 @@ const initialize: State = {
   parkingLotsWithAvailable: [],
   area: '',
   keywords: '',
+  searchMarker: null,
 };
 
 const useStore = create<State & Action>((set) => {
@@ -87,7 +89,6 @@ const useStore = create<State & Action>((set) => {
         });
     },
     updateAllAvailable() {
-      console.log('update');
       fetchAllAvailable()
         .then((res) => {
           if (res.statusText === 'OK') set({ allAvailable: res.data.data.park });
@@ -142,6 +143,9 @@ const useStore = create<State & Action>((set) => {
         aroundParkingLotWithAvailable: parkingAvailable,
       });
     },
+    setGoogleMap(map) {
+      set({ googleMap: map });
+    },
     setClickCoord(latlng) {
       set({ clickCoord: latlng });
     },
@@ -156,6 +160,9 @@ const useStore = create<State & Action>((set) => {
     },
     setKeywords(keywords) {
       set({ keywords });
+    },
+    setSearchMarker(latlng) {
+      set({ searchMarker: latlng, clickCoord: latlng });
     },
   };
 });
