@@ -140,9 +140,14 @@ const useStore = create<State & Action>((set) => {
       // eslint-disable-next-line consistent-return
       set({ parkingLotsWithAvailable: result });
     },
-    goToMap(tw97x, tw97y) {
+    goToMap(tw97x, tw97y, parkingAvailable) {
       const latlng = twd97ToLatlng(parseFloat(tw97x), parseFloat(tw97y));
-      set({ mapCenter: latlng, filterMarker: latlng, clickCoord: latlng });
+      set({
+        mapCenter: latlng,
+        filterMarker: latlng,
+        clickCoord: latlng,
+        aroundParkingLotWithAvailable: parkingAvailable,
+      });
     },
     setClickCoord(latlng) {
       set({ clickCoord: latlng });

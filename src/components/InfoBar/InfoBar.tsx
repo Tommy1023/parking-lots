@@ -33,31 +33,31 @@ const InfoBar = memo(({ parkingLot }: { parkingLot: ParkingLotsWithAvailable }) 
     <div className="mb-1 flex">
       {type2 === '1' ? (
         <InfoItem
-          data={{ type: '公', color: 'primary' }}
+          data={{ type: '公', color: 'text-primary' }}
           haveDescribe={false}
           showInfoBox
         />
       ) : (
         <InfoItem
-          data={{ type: '民', color: 'warning' }}
+          data={{ type: '民', color: 'text-warning' }}
           haveDescribe={false}
           showInfoBox
         />
       )}
       {type === '1' && (
         <InfoItem
-          data={{ type: '即', color: 'success' }}
+          data={{ type: '即', color: 'text-success' }}
           haveDescribe={false}
           showInfoBox
         />
       )}
       {Handicap_First && (
-        <InfoItem data={{ color: 'primary' }} haveDescribe={false} showInfoBox>
+        <InfoItem data={{ color: 'text-primary' }} haveDescribe={false} showInfoBox>
           <FaWheelchair />
         </InfoItem>
       )}
       {Pregnancy_First && (
-        <InfoItem data={{ color: 'pink-500' }} haveDescribe={false} showInfoBox>
+        <InfoItem data={{ color: 'text-pink-500' }} haveDescribe={false} showInfoBox>
           <FaBabyCarriage />
         </InfoItem>
       )}
@@ -66,7 +66,7 @@ const InfoBar = memo(({ parkingLot }: { parkingLot: ParkingLotsWithAvailable }) 
           return (
             <InfoItem
               key={parkingLotType}
-              data={{ type: parkingLotType, color: 'info' }}
+              data={{ type: parkingLotType, color: 'text-info' }}
               haveDescribe={false}
               showInfoBox
             />

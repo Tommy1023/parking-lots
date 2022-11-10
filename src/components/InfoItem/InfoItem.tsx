@@ -18,7 +18,7 @@ const InfoItem = memo(
         data-active={showInfoBox}
       >
         <p
-          className={`mr-1 h-6 w-6 rounded-md border-2 flex-center border-${data.color} text-center text-sm text-${data.color}`}
+          className={`mr-1 h-6 w-6 rounded-md border-2 border-current text-center text-sm flex-center ${data.color}`}
         >
           {children || data.type}
         </p>

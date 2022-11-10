@@ -34,9 +34,10 @@ const ListCard = memo(({ parkingLot }: { parkingLot: ParkingLotsWithAvailable })
   const standbyChargeStationCount = chargeStationList?.filter((scoketStatus) => {
     return scoketStatus.spot_status === '待機中';
   });
-  const { goToMap } = useStore((state) => {
+  const { goToMap, parkingLotsWithAvailable } = useStore((state) => {
     return {
       goToMap: state.goToMap,
+      parkingLotsWithAvailable: state.parkingLotsWithAvailable,
     };
   }, shallow);
 
@@ -105,7 +106,7 @@ const ListCard = memo(({ parkingLot }: { parkingLot: ParkingLotsWithAvailable })
             className="flex cursor-pointer items-center"
             to="/map"
             onClick={() => {
-              goToMap(tw97x, tw97y);
+              goToMap(tw97x, tw97y, parkingLotsWithAvailable);
             }}
           >
             <FaMapMarkerAlt color="#911d1d" />

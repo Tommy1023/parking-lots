@@ -31,7 +31,11 @@ export type Action = {
     parkingLots: Park[],
     allAvailable: AvailablePark[],
   ) => void;
-  goToMap: (tw97x: string, tw97y: string) => void;
+  goToMap: (
+    tw97x: string,
+    tw97y: string,
+    parkingLotsWithAvailable: ParkingLotsWithAvailable[],
+  ) => void;
   setClickCoord: (latlng: google.maps.LatLngLiteral | null) => void;
   setFilterMarker: (latlng: google.maps.LatLngLiteral | null) => void;
   setMapCenter: (latlng: google.maps.LatLngLiteral | null) => void;

@@ -150,14 +150,14 @@ const Map = memo(() => {
           );
         })}
         <InfoItem
-          data={{ name: '身障專用', color: 'primary' }}
+          data={{ name: '身障專用', color: 'text-primary' }}
           haveDescribe
           showInfoBox={showInfoBox}
         >
           <FaWheelchair />
         </InfoItem>
         <InfoItem
-          data={{ name: '懷孕優先', color: 'pink-500' }}
+          data={{ name: '懷孕優先', color: 'text-pink-500' }}
           haveDescribe
           showInfoBox={showInfoBox}
         >

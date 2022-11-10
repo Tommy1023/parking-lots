@@ -42,8 +42,6 @@ const List = () => {
     },
   });
 
-  // const [area, setArea] = useState<string>('');
-  // const [keywords, setKeywords] = useState<string>('');
   const [filterParkingLots, setFilterParkingLots] = useState<Array<Park>>([]);
 
   const areaFilter = (data: Array<Park>, condition: FormValues): void => {
