@@ -1,0 +1,10 @@
+[
+  { "name": "公營",  "type":"公","color": "primary" },
+  { "name": "民營",  "type":"民","color": "warning" },
+  { "name": "即時更新",  "type":"即","color": "success" },
+  { "name": "立體停車場",  "type":"立","color": "info" }, 
+  { "name": "塔式停車場",  "type":"塔","color": "info" },
+  { "name": "機械停車場",  "type":"機","color": "info" },
+  { "name": "平面停車場",  "type":"平","color": "info" },
+  { "name": "地下停車場",  "type":"地","color": "info" }
+]

@@ -1,37 +1,29 @@
+/* eslint-disable camelcase */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { memo, useState, useEffect, useCallback } from 'react';
 import { Park, AvailablePark } from '../../../../types';
+import InfoBar from '../../../InfoBar';
 import { twd97ToLatlng } from '../../../../helpers/coordTransHelper';
 
 type ParkingInfoProp = {
   origin: google.maps.LatLngLiteral;
   parkingLot:
-    | (Park & {
+    | Park & {
         parkingAvailable?: AvailablePark | undefined;
-      })
-    | null;
+      };
 };
 
 const ParkingInfo = ({ origin, parkingLot }: ParkingInfoProp) => {
-  const {
-    name,
-    tw97x,
-    tw97y,
-    summary,
-    payex,
-    parkingAvailable,
-    totalcar,
-    totalmotor,
-    totalbus,
-  } = parkingLot!;
+  const { name, tw97x, tw97y, payex, parkingAvailable, totalcar, totalmotor, totalbus } =
+    parkingLot!;
   const chargeStationList = parkingAvailable?.ChargeStation?.scoketStatusList;
   const standbyChargeStationCount = chargeStationList?.filter((scoketStatus) => {
     return scoketStatus.spot_status === '待機中';
   });
-  const [distanceAndDuration, setDistanceAndDuration] =
-    useState<google.maps.DirectionsResult | null>(null);
 
   // 記算所在地與目的地的距離與行車時間
+  const [distanceAndDuration, setDistanceAndDuration] =
+    useState<google.maps.DirectionsResult | null>(null);
   const calculateRoute = useCallback(
     async (
       start: google.maps.LatLngLiteral,
@@ -55,12 +47,12 @@ const ParkingInfo = ({ origin, parkingLot }: ParkingInfoProp) => {
   useEffect(() => {
     calculateRoute(origin, { x: tw97x, y: tw97y });
   }, [origin, tw97x, tw97y, calculateRoute]);
+
   return (
     <div className="h-full w-full rounded-2xl border-4 bg-light p-4">
-      <div className="text-lg font-semibold">{name}</div>
-      <div>
-        <div className="my-2 font-medium">介紹：</div>
-        <div className="font-normal">{summary}</div>
+      <div className="flex flex-col justify-between text-lg font-semibold">
+        <p className="mb-2 text-lg font-medium">{name}</p>
+        <InfoBar parkingLot={parkingLot} />
       </div>
       <div>
         <div className="my-2 font-medium">收費：</div>

@@ -2,7 +2,7 @@
 import create from 'zustand';
 import { fetchAllAvailable, fetchParkingLots } from '../service/parkingLotsApi';
 import { State, Action, Park, AvailablePark } from '../types';
-import { latlngToTwd97 } from '../helpers/coordTransHelper';
+import { latlngToTwd97, twd97ToLatlng } from '../helpers/coordTransHelper';
 
 const initialize: State = {
   isAppInitializedComplete: false,
@@ -11,7 +11,12 @@ const initialize: State = {
   allAvailable: [],
   userCenter: null,
   mapCenter: null,
-  aroundParkingLotWithAvailable: null,
+  clickCoord: null,
+  filterMarker: null,
+  aroundParkingLotWithAvailable: [],
+  parkingLotsWithAvailable: [],
+  area: '',
+  keywords: '',
 };
 
 const useStore = create<State & Action>((set) => {
@@ -31,11 +36,14 @@ const useStore = create<State & Action>((set) => {
         } else {
           navigator.geolocation.getCurrentPosition(
             (position) => {
+              const latlng = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+              };
               set({
-                userCenter: {
-                  lat: position.coords.latitude,
-                  lng: position.coords.longitude,
-                },
+                userCenter: latlng,
+                mapCenter: latlng,
+                clickCoord: latlng,
               });
             },
             () => {
@@ -120,6 +128,36 @@ const useStore = create<State & Action>((set) => {
         return { ...parkingLot, parkingAvailable: parkingAvailable?.[0] };
       });
       set({ aroundParkingLotWithAvailable });
+    },
+    getParkingLotsWithAvailable(parkingLots, allAvailable) {
+      if (!parkingLots || !allAvailable) return;
+      const result = parkingLots.map((parkingLot) => {
+        const parkingAvailable = allAvailable?.filter((available) => {
+          return available.id === parkingLot.id;
+        });
+        return { ...parkingLot, parkingAvailable: parkingAvailable?.[0] };
+      });
+      // eslint-disable-next-line consistent-return
+      set({ parkingLotsWithAvailable: result });
+    },
+    goToMap(tw97x, tw97y) {
+      const latlng = twd97ToLatlng(parseFloat(tw97x), parseFloat(tw97y));
+      set({ mapCenter: latlng, filterMarker: latlng, clickCoord: latlng });
+    },
+    setClickCoord(latlng) {
+      set({ clickCoord: latlng });
+    },
+    setFilterMarker(latlng) {
+      set({ filterMarker: latlng });
+    },
+    setMapCenter(latlng) {
+      set({ mapCenter: latlng });
+    },
+    setArea(area) {
+      set({ area });
+    },
+    setKeywords(keywords) {
+      set({ keywords });
     },
   };
 });

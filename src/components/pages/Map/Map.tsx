@@ -2,13 +2,22 @@
 import React, { memo, useRef, useState, useEffect } from 'react';
 import { GoogleMap, useJsApiLoader, MarkerF } from '@react-google-maps/api';
 import shallow from 'zustand/shallow';
-import { FaInfoCircle, FaCrosshairs, FaParking, FaSpinner } from 'react-icons/fa';
+import {
+  FaInfoCircle,
+  FaCrosshairs,
+  FaParking,
+  FaSpinner,
+  FaWheelchair,
+  FaBabyCarriage,
+} from 'react-icons/fa';
 import useStore from '../../../store';
 import CustomMarker from './components/CustomMarker';
 import ParkingInfo from './components/ParkingInfo';
 import { Park, AvailablePark } from '../../../types';
 import IconBtn from './components/IconBtn';
 import parkingIconState from './parkingIconState.json';
+import InfoItem from '../../InfoItem/InfoItem';
+import parkingType from './parkingType.json';
 
 const Map = memo(() => {
   // -------------------------- Hooks --------------------------
@@ -18,22 +27,30 @@ const Map = memo(() => {
   const {
     parkingLots,
     userCenter,
+    mapCenter,
+    clickCoord,
     allAvailable,
     getAroundParkingLotsWithAvailable,
     aroundParkingLotWithAvailable,
+    filterMarker,
+    setClickCoord,
+    setMapCenter,
   } = useStore((state) => {
     return {
       parkingLots: state.parkingLots,
       userCenter: state.userCenter,
+      mapCenter: state.mapCenter,
+      clickCoord: state.clickCoord,
       allAvailable: state.allAvailable,
       getAroundParkingLotsWithAvailable: state.getAroundParkingLotsWithAvailable,
       aroundParkingLotWithAvailable: state.aroundParkingLotWithAvailable,
+      filterMarker: state.filterMarker,
+      setClickCoord: state.setClickCoord,
+      setMapCenter: state.setMapCenter,
     };
   }, shallow);
 
   // -------------------------- States --------------------------
-  const [mapCenter, setMapCenter] = useState<google.maps.LatLngLiteral>(userCenter!);
-  const [clickCoord, setClickCoord] = useState<google.maps.LatLngLiteral>(userCenter!);
   const [activeMarker, setActiveMarker] = useState<string | null>(null);
   const [showParkingLotInfo, setShowParkingLotInfo] = useState<
     | (Park & {
@@ -71,8 +88,9 @@ const Map = memo(() => {
   // ------------------------- useEffect -------------------------
   useEffect(() => {
     // 取得點擊地點坐標附近停車場資料
-    if (!parkingLots || !clickCoord || !allAvailable) return;
-    getAroundParkingLotsWithAvailable(parkingLots, clickCoord, allAvailable);
+    if (parkingLots && clickCoord && allAvailable) {
+      getAroundParkingLotsWithAvailable(parkingLots, clickCoord, allAvailable);
+    }
   }, [parkingLots, clickCoord, allAvailable, getAroundParkingLotsWithAvailable]);
 
   if (!isLoaded) {
@@ -93,7 +111,6 @@ const Map = memo(() => {
         <IconBtn
           onClick={() => {
             mapRef.current?.panTo(userCenter!);
-            setClickCoord(userCenter!);
           }}
         >
           <FaCrosshairs size="1.6rem" color="blue" />
@@ -114,7 +131,7 @@ const Map = memo(() => {
           return (
             <div
               key={info.name}
-              className="flex items-center opacity-0 transition-opacity delay-150 data-active:opacity-100"
+              className="mb-1 flex items-center opacity-0 transition-opacity delay-150 data-active:opacity-100"
               data-active={showInfoBox}
             >
               <FaParking size="1.5rem" color={info.color} />
@@ -122,12 +139,36 @@ const Map = memo(() => {
             </div>
           );
         })}
+        {parkingType.map((item) => {
+          return (
+            <InfoItem
+              key={item.name}
+              data={item}
+              haveDescribe
+              showInfoBox={showInfoBox}
+            />
+          );
+        })}
+        <InfoItem
+          data={{ name: '身障專用', color: 'primary' }}
+          haveDescribe
+          showInfoBox={showInfoBox}
+        >
+          <FaWheelchair />
+        </InfoItem>
+        <InfoItem
+          data={{ name: '懷孕優先', color: 'pink-500' }}
+          haveDescribe
+          showInfoBox={showInfoBox}
+        >
+          <FaBabyCarriage />
+        </InfoItem>
       </div>
       {/* ----------google map---------- */}
       <div className="h-full w-full">
         <GoogleMap
           center={mapCenter!} // 地圖中央座標
-          zoom={16} // 地圖縮放大小，數字越大越近
+          zoom={15} // 地圖縮放大小，數字越大越近
           mapContainerStyle={{ width: '100%', height: '100%' }} // 地圖大小
           options={{
             // 預設為true
@@ -153,6 +194,7 @@ const Map = memo(() => {
         >
           {/* ----------Markers---------- */}
           <MarkerF position={userCenter!} />
+          {filterMarker && <MarkerF position={filterMarker} />}
           {aroundParkingLotWithAvailable?.map((parkingLot) => {
             return (
               <CustomMarker

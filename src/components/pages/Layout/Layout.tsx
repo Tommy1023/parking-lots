@@ -2,7 +2,7 @@ import React, { memo } from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
 import {
   FaMapMarkedAlt,
-  FaThList,
+  FaFilter,
   FaUserAlt,
   FaWhmcs,
   FaRegBookmark,
@@ -24,7 +24,7 @@ const Home = () => {
             <FaMapMarkedAlt className="icon h-8 w-8 text-[#bae6fd] transition delay-150  duration-300 hover:-translate-y-3 hover:text-primary" />
           </NavLink>
           <NavLink to="parkingList">
-            <FaThList className="icon h-8 w-8 text-[#bae6fd] transition delay-150 duration-300 hover:-translate-y-3 hover:text-primary" />
+            <FaFilter className="icon h-8 w-8 text-[#bae6fd] transition delay-150 duration-300 hover:-translate-y-3 hover:text-primary" />
           </NavLink>
           <NavLink to="keeps">
             <FaRegBookmark className="icon h-8 w-8 text-[#bae6fd] transition delay-150 duration-300 hover:-translate-y-3 hover:text-primary" />

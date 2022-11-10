@@ -2,15 +2,20 @@
 export type State = {
   isAppInitializedComplete: boolean;
   isLoading: boolean;
-  parkingLots: Array<Park> | null;
-  allAvailable: Array<AvailablePark> | null;
+  parkingLots: Array<Park>;
+  allAvailable: Array<AvailablePark>;
   userCenter: google.maps.LatLngLiteral | null;
   mapCenter: google.maps.LatLngLiteral | null;
-  aroundParkingLotWithAvailable:
-    | (Array<Park> & {
-        parkingAvailable?: AvailablePark;
-      })
-    | null;
+  clickCoord: google.maps.LatLngLiteral | null;
+  filterMarker: google.maps.LatLngLiteral | null;
+  aroundParkingLotWithAvailable: Array<ParkingLotsWithAvailable>;
+  parkingLotsWithAvailable: Array<ParkingLotsWithAvailable>;
+  area: string;
+  keywords: string;
+};
+
+export type ParkingLotsWithAvailable = Park & {
+  parkingAvailable?: AvailablePark;
 };
 
 export type Action = {
@@ -22,6 +27,16 @@ export type Action = {
     clickCoord: google.maps.LatLngLiteral,
     allAvailable: AvailablePark[] | null,
   ) => void;
+  getParkingLotsWithAvailable: (
+    parkingLots: Park[],
+    allAvailable: AvailablePark[],
+  ) => void;
+  goToMap: (tw97x: string, tw97y: string) => void;
+  setClickCoord: (latlng: google.maps.LatLngLiteral | null) => void;
+  setFilterMarker: (latlng: google.maps.LatLngLiteral | null) => void;
+  setMapCenter: (latlng: google.maps.LatLngLiteral | null) => void;
+  setArea: (area: string) => void;
+  setKeywords: (keywords: string) => void;
 };
 
 export type Park = {
