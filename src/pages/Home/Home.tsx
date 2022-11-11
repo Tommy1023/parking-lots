@@ -1,8 +1,9 @@
 import React, { memo } from 'react';
-import { Link } from 'react-router-dom';
 import { FaMapMarkerAlt } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
 import shallow from 'zustand/shallow';
 import useStore from '../../store';
+import Button from './components/Button';
 
 const Home = memo(() => {
   const { isAppInitializedComplete } = useStore((state) => {
@@ -19,6 +20,7 @@ const Home = memo(() => {
         </div>
         <div className=" pt-1 text-3xl text-light">Parking Lot</div>
       </div>
+      <Button toggle={isAppInitializedComplete} />
       {isAppInitializedComplete ? (
         <Link
           to="map"
