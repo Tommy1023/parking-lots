@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
+
 import { FaMapMarkerAlt } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
 import shallow from 'zustand/shallow';
 import useStore from '../../store';
 import Button from './components/Button';
@@ -21,21 +21,6 @@ const Home = memo(() => {
         <div className=" pt-1 text-3xl text-light">Parking Lot</div>
       </div>
       <Button toggle={isAppInitializedComplete} />
-      {isAppInitializedComplete ? (
-        <Link
-          to="map"
-          className="mb-4 mt-auto flex w-[60%] justify-center rounded-xl bg-primary p-2 text-light"
-        >
-          開始使用
-        </Link>
-      ) : (
-        <button
-          className="mb-4 mt-auto flex w-[60%] justify-center rounded-xl bg-primary p-2 text-light"
-          disabled={isAppInitializedComplete}
-        >
-          應用程式初使化中
-        </button>
-      )}
     </div>
   );
 });
