@@ -1,5 +1,4 @@
 import React, { memo } from 'react';
-
 import { FaMapMarkerAlt } from 'react-icons/fa';
 import shallow from 'zustand/shallow';
 import useStore from '../../store';
