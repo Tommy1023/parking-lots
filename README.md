@@ -1,4 +1,4 @@
-<h1>Expense-Tracker</h1>
+<h1>Parking Lot</h1>
 
 ![npm version](https://img.shields.io/badge/npm-v8.11.0-blue?style=flat 'npm')
 ![node version](https://img.shields.io/badge/node-v16.15.1-impotent?style=flat 'node')
