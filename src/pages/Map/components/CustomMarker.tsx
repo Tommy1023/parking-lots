@@ -6,22 +6,15 @@ import { twd97ToLatlng } from '../../../helpers/coordTransHelper';
 
 type CustomMarkerProp = {
   parkingLot: Park & { parkingAvailable?: AvailablePark | undefined };
-  onSetActiveMarKer: (id: string | null) => void;
   onHandleActiveMarker: (
-    id: string | null,
-    ParkingLot: Park & {
+    markerId: string | null,
+    parkingLot: Park & {
       parkingAvailable?: AvailablePark | undefined;
     },
   ) => void;
-  onSetClickCoord: ({ lat, lng }: { lat: number; lng: number }) => void;
 };
 
-const CustomMarker = ({
-  parkingLot,
-  onSetActiveMarKer,
-  onHandleActiveMarker,
-  onSetClickCoord,
-}: CustomMarkerProp) => {
+const CustomMarker = ({ parkingLot, onHandleActiveMarker }: CustomMarkerProp) => {
   const { id, tw97x, tw97y, parkingAvailable } = parkingLot;
   const numTw97x = useRef<number>(parseFloat(tw97x!));
   const numTw97y = useRef<number>(parseFloat(tw97y!));
@@ -50,7 +43,6 @@ const CustomMarker = ({
       position={transPosition.current}
       onClick={() => {
         onHandleActiveMarker(id, parkingLot);
-        onSetClickCoord(transPosition.current);
       }}
     />
   );

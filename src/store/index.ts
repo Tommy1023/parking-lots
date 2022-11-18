@@ -7,12 +7,13 @@ import { latlngToTwd97, twd97ToLatlng } from '../helpers/coordTransHelper';
 const initialize: State = {
   isAppInitializedComplete: false,
   isLoading: false,
+  isGetPosition: false,
   googleMap: null,
   parkingLots: [],
   allAvailable: [],
   userCenter: null,
   mapCenter: null,
-  clickCoord: null,
+  clickCoord: { lat: 25.03369, lng: 121.564128 },
   filterMarker: null,
   aroundParkingLotWithAvailable: [],
   parkingLotsWithAvailable: [],
@@ -29,34 +30,6 @@ const useStore = create<State & Action>((set) => {
     // actions
     async init() {
       console.log('App Initialized Start');
-      // 取得使用者定位
-      try {
-        // 確認 browser 是否有支援
-        if (!navigator.geolocation) {
-          // eslint-disable-next-line no-alert
-          alert('Geolocation is not supported by your browser');
-        } else {
-          navigator.geolocation.getCurrentPosition(
-            (position) => {
-              const latlng = {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude,
-              };
-              set({
-                userCenter: latlng,
-                mapCenter: latlng,
-                clickCoord: latlng,
-              });
-            },
-            () => {
-              alert('無法取得定位，請稍後再試');
-            },
-          );
-        }
-      } catch (error) {
-        console.log('getLocation error:', error);
-      }
-
       // 取得停車場資料
       try {
         const parkingLots = await fetchParkingLots();
@@ -78,6 +51,38 @@ const useStore = create<State & Action>((set) => {
       }
       set({ isAppInitializedComplete: true });
       console.log('App Initialized Complete');
+    },
+    async getGeolocation() {
+      // 確認 browser 是否有支援
+      if (!navigator.geolocation) {
+        // eslint-disable-next-line no-alert
+        alert('您的瀏覽器不支援定位功能');
+      } else {
+        const permission = await navigator.permissions.query({ name: 'geolocation' });
+        if (permission.state !== 'denied') {
+          set({ isGetPosition: true });
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const latlng = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+              };
+              set({
+                userCenter: latlng,
+                mapCenter: latlng,
+                clickCoord: latlng,
+                isGetPosition: false,
+              });
+            },
+            () => {
+              alert('無法取得定位!');
+              set({ isGetPosition: false });
+            },
+          );
+        } else {
+          alert('請開啟定位功能!');
+        }
+      }
     },
     updateParkingLots() {
       fetchParkingLots()

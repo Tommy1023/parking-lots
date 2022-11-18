@@ -6,7 +6,7 @@ import InfoBar from '../../../components/InfoBar';
 import { twd97ToLatlng } from '../../../helpers/coordTransHelper';
 
 type ParkingInfoProp = {
-  origin: google.maps.LatLngLiteral;
+  origin: google.maps.LatLngLiteral | null;
   parkingLot:
     | Park & {
         parkingAvailable?: AvailablePark | undefined;
@@ -45,7 +45,7 @@ const ParkingInfo = ({ origin, parkingLot }: ParkingInfoProp) => {
   );
 
   useEffect(() => {
-    calculateRoute(origin, { x: tw97x, y: tw97y });
+    if (origin !== null) calculateRoute(origin, { x: tw97x, y: tw97y });
   }, [origin, tw97x, tw97y, calculateRoute]);
 
   return (
@@ -95,19 +95,25 @@ const ParkingInfo = ({ origin, parkingLot }: ParkingInfoProp) => {
           </div>
         </div>
       ) : null}
-      <div className="flex items-center py-2">
-        <a
-          href={`https://www.google.com/maps/dir/?api=1&origin=${origin.lat},${origin.lng}&destination=${name}&travelmode=driving`}
-          target="_blank"
-          className="w-1/2 cursor-pointer rounded-lg bg-primary py-2 text-center text-light"
-          rel="noreferrer"
-        >
-          開車{distanceAndDuration?.routes[0].legs[0].distance?.text}
-        </a>
-        <div className="mr-0 ml-auto">
-          距離{distanceAndDuration?.routes[0].legs[0].duration?.text}
+      {origin === null ? (
+        <div className="mt-2 rounded-md bg-warning p-2 flex-center">
+          請開啟定位功能進行導航
         </div>
-      </div>
+      ) : (
+        <div className="flex items-center py-2">
+          <a
+            href={`https://www.google.com/maps/dir/?api=1&origin=${origin.lat},${origin.lng}&destination=${name}&travelmode=driving`}
+            target="_blank"
+            className="w-1/2 cursor-pointer rounded-lg bg-primary py-2 text-center text-light"
+            rel="noreferrer"
+          >
+            開車{distanceAndDuration?.routes[0].legs[0].distance?.text}
+          </a>
+          <div className="mr-0 ml-auto">
+            距離{distanceAndDuration?.routes[0].legs[0].duration?.text}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -35,7 +35,7 @@ const IsLoading = ({ children }: { children: React.ReactElement }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (isLoading || !userCenter || !allAvailable || !parkingLots) {
+  if (isLoading || !allAvailable || !parkingLots) {
     return (
       <div className="h-full w-full bg-light text-2xl flex-center">
         <div className="animate-spin p-2 text-primary">

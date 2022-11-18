@@ -1,12 +1,6 @@
 import React, { memo } from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
-import {
-  FaMapMarkedAlt,
-  FaFilter,
-  FaUserAlt,
-  FaWhmcs,
-  FaRegBookmark,
-} from 'react-icons/fa';
+import { FaMapMarkedAlt, FaFilter } from 'react-icons/fa';
 import style from './layout.module.scss';
 import IsLoading from '../../containers/IsLoading';
 
@@ -25,15 +19,6 @@ const Home = () => {
           </NavLink>
           <NavLink to="parkingList">
             <FaFilter className="icon h-8 w-8 text-[#bae6fd] transition delay-150 duration-300 hover:-translate-y-3 hover:text-primary" />
-          </NavLink>
-          <NavLink to="keeps">
-            <FaRegBookmark className="icon h-8 w-8 text-[#bae6fd] transition delay-150 duration-300 hover:-translate-y-3 hover:text-primary" />
-          </NavLink>
-          <NavLink to="user">
-            <FaUserAlt className="icon h-8 w-8 text-[#bae6fd] transition delay-150 duration-300 hover:-translate-y-3 hover:text-primary" />
-          </NavLink>
-          <NavLink to="setting">
-            <FaWhmcs className="icon h-8 w-8 text-[#bae6fd] transition delay-150 duration-300 hover:-translate-y-3 hover:text-primary" />
           </NavLink>
         </div>
       </div>

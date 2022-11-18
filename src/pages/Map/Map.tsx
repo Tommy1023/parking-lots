@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { memo, useState, useEffect } from 'react';
+import React, { memo, useState, useEffect, useCallback, useRef } from 'react';
 import { GoogleMap, useJsApiLoader, MarkerF } from '@react-google-maps/api';
 import shallow from 'zustand/shallow';
 import {
@@ -31,6 +31,8 @@ const Map = memo(() => {
   });
   const {
     googleMap,
+    isGetPosition,
+    getGeolocation,
     parkingLots,
     userCenter,
     mapCenter,
@@ -46,6 +48,8 @@ const Map = memo(() => {
   } = useStore((state) => {
     return {
       googleMap: state.googleMap,
+      isGetPosition: state.isGetPosition,
+      getGeolocation: state.getGeolocation,
       parkingLots: state.parkingLots,
       userCenter: state.userCenter,
       mapCenter: state.mapCenter,
@@ -62,7 +66,10 @@ const Map = memo(() => {
   }, shallow);
 
   // -------------------------- States --------------------------
-  const [activeMarker, setActiveMarker] = useState<string | null>(null);
+  const defaultCenter = useRef<{ lat: number; lng: number }>({
+    lat: 25.03369,
+    lng: 121.564128,
+  });
   const [showParkingLotInfo, setShowParkingLotInfo] = useState<
     | (Park & {
         parkingAvailable?: AvailablePark | undefined;
@@ -70,31 +77,32 @@ const Map = memo(() => {
     | null
   >(null);
   const [showInfoBox, setShowInfoBox] = useState<boolean>(false);
-  // 使用 useRef 綁定 DOM 設定地圖存放位置
-  // const mapRef = useRef<google.maps.Map | null>(null);
 
   // -------------------------- Actions --------------------------
   // 點擊地圖取得點擊地點座標。
   const onMapClick = (e: google.maps.MapMouseEvent) => {
     if (e.latLng) {
-      setActiveMarker(null);
       setShowParkingLotInfo(null);
       setClickCoord({ lat: e.latLng.lat(), lng: e.latLng.lng() });
     }
   };
 
   // Parking InfoWindow 開關，判斷被點擊的 marker
-  const handleActiveMarker = (
-    marker: string | null,
-    ParkingLot: Park & {
-      parkingAvailable?: AvailablePark | undefined;
+  const handleActiveMarker = useCallback(
+    (
+      markerId: string | null,
+      parkingLot: Park & {
+        parkingAvailable?: AvailablePark | undefined;
+      },
+    ) => {
+      if (markerId !== showParkingLotInfo?.id) {
+        setShowParkingLotInfo(parkingLot);
+      } else {
+        setShowParkingLotInfo(null);
+      }
     },
-  ) => {
-    if (marker !== activeMarker) {
-      setActiveMarker(marker);
-      setShowParkingLotInfo(ParkingLot);
-    }
-  };
+    [showParkingLotInfo?.id],
+  );
 
   // ------------------------- useEffect -------------------------
   useEffect(() => {
@@ -103,6 +111,10 @@ const Map = memo(() => {
       getAroundParkingLotsWithAvailable(parkingLots, clickCoord, allAvailable);
     }
   }, [parkingLots, clickCoord, allAvailable, getAroundParkingLotsWithAvailable]);
+
+  useEffect(() => {
+    if (userCenter === null) getGeolocation();
+  }, [getGeolocation, userCenter]);
 
   if (!isLoaded) {
     return (
@@ -121,7 +133,11 @@ const Map = memo(() => {
       <div className="absolute top-4 right-4 z-[1] transition delay-150 duration-300 hover:-translate-y-1">
         <IconBtn
           onClick={() => {
-            googleMap?.panTo(userCenter!);
+            if (userCenter) {
+              googleMap?.panTo(userCenter);
+            } else {
+              googleMap?.panTo(defaultCenter.current);
+            }
           }}
         >
           <FaCrosshairs size="1.6rem" color="blue" />
@@ -175,10 +191,19 @@ const Map = memo(() => {
           <FaBabyCarriage />
         </InfoItem>
       </div>
+      {/* ----------Position Loading---------- */}
+      {isGetPosition && (
+        <div className=" absolute bottom-3 left-1/2 z-[1] -translate-x-1/2 text-2xl flex-center">
+          <div className="animate-spin p-2 text-primary">
+            <FaSpinner />
+          </div>
+          <p className=" animate-bounce text-primary">定位中...</p>
+        </div>
+      )}
       {/* ----------google map---------- */}
       <div className="h-full w-full">
         <GoogleMap
-          center={mapCenter!} // 地圖中央座標
+          center={mapCenter || defaultCenter.current} // 地圖中央座標
           zoom={15} // 地圖縮放大小，數字越大越近
           mapContainerStyle={{ width: '100%', height: '100%' }} // 地圖大小
           options={{
@@ -198,7 +223,9 @@ const Map = memo(() => {
           onDragEnd={() => {
             const latlng: google.maps.LatLng | undefined = googleMap?.getCenter();
             if (latlng) {
+              // 改善 rerender 後畫面跑回初始坐標
               setMapCenter({ lat: latlng?.lat(), lng: latlng.lng() });
+              // drag 顯示坐標週圍停車場
               setClickCoord({ lat: latlng?.lat(), lng: latlng.lng() });
             }
           }}
@@ -211,7 +238,7 @@ const Map = memo(() => {
             <SearchBar />
           </div>
           {/* ----------Markers---------- */}
-          <MarkerF position={userCenter!} />
+          {userCenter && <MarkerF position={userCenter} />}
           {filterMarker && <MarkerF position={filterMarker} />}
           {searchMarker && <MarkerF position={searchMarker} />}
           {aroundParkingLotWithAvailable?.map((parkingLot) => {
@@ -219,14 +246,12 @@ const Map = memo(() => {
               <CustomMarker
                 key={parkingLot.id}
                 parkingLot={parkingLot}
-                onSetActiveMarKer={setActiveMarker}
                 onHandleActiveMarker={handleActiveMarker}
-                onSetClickCoord={setClickCoord}
               />
             );
           })}
           {/* ----------ParkingInfo---------- */}
-          {userCenter && showParkingLotInfo && (
+          {showParkingLotInfo && (
             <div className=" absolute bottom-0 left-1/2 max-h-[40%] w-full -translate-x-1/2 overflow-y-scroll rounded-t-2xl p-1 md:top-0 md:left-0 md:max-h-full md:w-[30%] md:-translate-x-0">
               <ParkingInfo origin={userCenter} parkingLot={showParkingLotInfo} />
             </div>

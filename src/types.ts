@@ -3,6 +3,7 @@ export type State = {
   isAppInitializedComplete: boolean;
   googleMap: google.maps.Map | null;
   isLoading: boolean;
+  isGetPosition: boolean;
   parkingLots: Array<Park>;
   allAvailable: Array<AvailablePark>;
   userCenter: google.maps.LatLngLiteral | null;
@@ -22,6 +23,7 @@ export type ParkingLotsWithAvailable = Park & {
 
 export type Action = {
   init: () => void;
+  getGeolocation: () => void;
   updateParkingLots: () => void;
   updateAllAvailable: () => void;
   getAroundParkingLotsWithAvailable: (
