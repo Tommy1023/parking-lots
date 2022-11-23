@@ -152,7 +152,7 @@ const Map = memo(() => {
             </div>
             {/* ----------InfoBox---------- */}
             <div
-              className=" absolute right-0 top-10 hidden h-52 w-32 origin-top scale-y-0 rounded-md border-2 border-slate-400 bg-light p-2 shadow-md shadow-slate-400 transition-transform  data-active:block data-active:scale-100 data-active:delay-150"
+              className=" absolute right-0 top-10 hidden h-60 w-36 origin-top scale-y-0 flex-col rounded-md border-2 border-slate-400 bg-light px-3 py-2 shadow-md shadow-slate-400  transition-transform data-active:flex data-active:scale-100 data-active:delay-150"
               data-active={showInfoBox}
             >
               {parkingType.map((item) => {

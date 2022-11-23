@@ -3,9 +3,10 @@ import React, { memo, useState, useEffect } from 'react';
 import { FaWheelchair, FaBabyCarriage } from 'react-icons/fa';
 import InfoItem from '../InfoItem';
 import { ParkingLotsWithAvailable } from '../../types';
+import { prepServiceTime } from '../../helpers/prepServiceTime';
 
 const InfoBar = memo(({ parkingLot }: { parkingLot: ParkingLotsWithAvailable }) => {
-  const { summary, Handicap_First, Pregnancy_First } = parkingLot;
+  const { summary, Handicap_First, Pregnancy_First, serviceTime } = parkingLot;
 
   const [parkingLotTypes, setParkingLotTypes] = useState<Array<string>>([]);
 
@@ -31,6 +32,13 @@ const InfoBar = memo(({ parkingLot }: { parkingLot: ParkingLotsWithAvailable }) 
 
   return (
     <div className="mb-1 flex">
+      {prepServiceTime(serviceTime) === '24小時' && (
+        <InfoItem
+          data={{ color: 'text-warning', type: '24' }}
+          haveDescribe={false}
+          showInfoBox
+        />
+      )}
       {Handicap_First && (
         <InfoItem data={{ color: 'text-primary' }} haveDescribe={false} showInfoBox>
           <FaWheelchair />

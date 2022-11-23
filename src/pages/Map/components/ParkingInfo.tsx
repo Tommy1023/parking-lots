@@ -1,10 +1,11 @@
 /* eslint-disable camelcase */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { memo, useState, useEffect, useCallback } from 'react';
-import { FaLocationArrow, FaChargingStation } from 'react-icons/fa';
+import { FaLocationArrow } from 'react-icons/fa';
 import { Park, AvailablePark } from '../../../types';
 import InfoBar from '../../../components/InfoBar';
 import { twd97ToLatlng } from '../../../helpers/coordTransHelper';
+import { prepServiceTime } from '../../../helpers/prepServiceTime';
 
 type ParkingInfoProp = {
   origin: google.maps.LatLngLiteral | null;
@@ -15,7 +16,7 @@ type ParkingInfoProp = {
 };
 
 const ParkingInfo = ({ origin, parkingLot }: ParkingInfoProp) => {
-  const { name, tw97x, tw97y, payex, parkingAvailable } = parkingLot!;
+  const { name, tw97x, tw97y, payex, parkingAvailable, serviceTime } = parkingLot!;
   const chargeStationList = parkingAvailable?.ChargeStation?.scoketStatusList;
   const standbyChargeStationCount = chargeStationList?.filter((scoketStatus) => {
     return scoketStatus.spot_status === '待機中';
@@ -61,13 +62,19 @@ const ParkingInfo = ({ origin, parkingLot }: ParkingInfoProp) => {
         </div>
         {parkingAvailable?.ChargeStation && (
           <div className="flex items-center font-normal">
-            <FaChargingStation />
+            充電站：
             <p className="ml-2">
               {`${standbyChargeStationCount?.length} / ${chargeStationList?.length}`}
             </p>
           </div>
         )}
       </div>
+      {prepServiceTime(serviceTime) !== '24小時' && (
+        <div>
+          <div className="my-2 font-medium">營業時間：</div>
+          <div className="font-normal">{serviceTime}</div>
+        </div>
+      )}
       <div>
         <div className="my-2 font-medium">收費：</div>
         <div className="font-normal">{payex}</div>

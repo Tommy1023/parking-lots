@@ -13,6 +13,7 @@ import shallow from 'zustand/shallow';
 import { ParkingLotsWithAvailable } from '../../../types';
 import useStore from '../../../store';
 import InfoBar from '../../../components/InfoBar';
+import { prepServiceTime } from '../../../helpers/prepServiceTime';
 
 const ListCard = memo(({ parkingLot }: { parkingLot: ParkingLotsWithAvailable }) => {
   const {
@@ -119,7 +120,9 @@ const ListCard = memo(({ parkingLot }: { parkingLot: ParkingLotsWithAvailable })
         )}
       </div>
       <div>電話：{tel || '無提供資料'}</div>
-      <div>營業時間：{serviceTime || '無提供資料'}</div>
+      {prepServiceTime(serviceTime) !== '24小時' && (
+        <div>營業時間：{prepServiceTime(serviceTime)}</div>
+      )}
       <div>
         <p>收費資訊：</p>
         <p>{payex && payex !== '' ? payex : '無提供資料'}</p>

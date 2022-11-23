@@ -3,5 +3,6 @@
   { "name": "塔式停車場", "type":"塔", "color": "text-info" },
   { "name": "機械停車場", "type":"機", "color": "text-info" },
   { "name": "平面停車場", "type":"平", "color": "text-info" },
-  { "name": "地下停車場", "type":"地", "color": "text-info" }
+  { "name": "地下停車場", "type":"地", "color": "text-info" },
+  { "name": "24小時營業", "type":"24", "color": "text-warning" }
 ]
