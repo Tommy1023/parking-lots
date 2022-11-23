@@ -1,7 +1,7 @@
 import React, { memo, useState, useEffect, useCallback } from 'react';
 import shallow from 'zustand/shallow';
 import { useForm } from 'react-hook-form';
-import { FaSearch, FaEraser } from 'react-icons/fa';
+import { FaEraser } from 'react-icons/fa';
 import useStore from '../../store';
 import ListCard from './components/ListCard';
 import TAIPEIAREAS from './taipeiArea.json';
@@ -97,11 +97,13 @@ const List = () => {
   const atClean = () => {
     setValue('area', '');
     setValue('keywords', '');
+    setFilterParkingLots([]);
   };
 
   useEffect(() => {
     parkingLotFilter(parkingLots, { area, keywords });
   }, [parkingLots, area, keywords, parkingLotFilter]);
+
   useEffect(() => {
     getParkingLotsWithAvailable(filterParkingLots, allAvailable);
   }, [filterParkingLots, allAvailable, getParkingLotsWithAvailable]);
@@ -109,7 +111,7 @@ const List = () => {
   return (
     <div className="relative h-full w-full overflow-y-scroll bg-[#518ef0] p-6">
       <form
-        onSubmit={handleSubmit(atSubmit)}
+        onChange={handleSubmit(atSubmit)}
         className=" fixed top-0 left-0 mb-2 flex w-full items-center rounded-md border-4 border-slate-400 bg-light p-3"
       >
         <select
@@ -134,9 +136,6 @@ const List = () => {
           {...register('keywords')}
         />
         <div className="flex w-[15%] flex-col">
-          <button type="submit" className="m-2 flex h-[15px] items-center rounded-md p-1">
-            <FaSearch size="1.5rem" color="#518ef0" />
-          </button>
           <button
             type="submit"
             onClick={() => {

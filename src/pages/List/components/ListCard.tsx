@@ -43,10 +43,12 @@ const ListCard = memo(({ parkingLot }: { parkingLot: ParkingLotsWithAvailable })
 
   return (
     <div className="mt-3 h-1/3 w-full overflow-y-scroll rounded-md border-2 border-slate-400 bg-light p-2 shadow-lg">
-      {/* -------------------- Name -------------------- */}
-      <p className="mb-2 text-lg font-medium">{name}</p>
-      {/* -------------------- Icons -------------------- */}
-      <InfoBar parkingLot={parkingLot} />
+      <div className="flex justify-between">
+        {/* -------------------- Name -------------------- */}
+        <p className="mb-2 text-lg font-medium">{name}</p>
+        {/* -------------------- Icons -------------------- */}
+        <InfoBar parkingLot={parkingLot} />
+      </div>
       {/* -------------------- Parking Lots -------------------- */}
       <div className="flex justify-between">
         <div className="flex items-center">
@@ -55,7 +57,7 @@ const ListCard = memo(({ parkingLot }: { parkingLot: ParkingLotsWithAvailable })
               <FaCarSide />
               <div className="ml-1">
                 {parkingAvailable && parkingAvailable.availablecar > 0
-                  ? `${parkingAvailable.availablecar}/${totalcar}`
+                  ? `${parkingAvailable.availablecar} / ${totalcar}`
                   : totalcar}
               </div>
             </div>
@@ -73,7 +75,7 @@ const ListCard = memo(({ parkingLot }: { parkingLot: ParkingLotsWithAvailable })
               <FaMotorcycle />
               <div className="ml-1">
                 {parkingAvailable && parkingAvailable.availablemotor
-                  ? `${parkingAvailable.availablemotor}/${totalmotor}`
+                  ? `${parkingAvailable.availablemotor} / ${totalmotor}`
                   : totalmotor}
               </div>
             </div>
@@ -83,7 +85,7 @@ const ListCard = memo(({ parkingLot }: { parkingLot: ParkingLotsWithAvailable })
               <FaBusAlt />
               <div className="ml-1">
                 {parkingAvailable && parkingAvailable.availablebus
-                  ? `${parkingAvailable.availablebus}/${totalbus}`
+                  ? `${parkingAvailable.availablebus} / ${totalbus}`
                   : totalbus}
               </div>
             </div>
