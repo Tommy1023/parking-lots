@@ -104,6 +104,7 @@ const useStore = create<State & Action>((set) => {
     },
     getAroundParkingLotsWithAvailable(parkingLots, clickCoord, allAvailable) {
       if (!parkingLots || !clickCoord) return;
+      // 篩選範圍內停車場
       const aroundParkingLots: Array<Park> = parkingLots.filter((parkingLot) => {
         const twd97ClickCoord = latlngToTwd97(clickCoord.lat, clickCoord.lng);
         const top = twd97ClickCoord.twd97x + 1000;
@@ -118,13 +119,16 @@ const useStore = create<State & Action>((set) => {
         );
       });
       if (!aroundParkingLots) return;
+      // 合併停車場及剩餘車位資料
       const aroundParkingLotWithAvailable: Array<Park> & {
         parkingAvailable?: AvailablePark;
       } = aroundParkingLots.map((parkingLot) => {
         const parkingAvailable = allAvailable?.filter((available) => {
           return available.id === parkingLot.id;
         });
-        return { ...parkingLot, parkingAvailable: parkingAvailable?.[0] };
+        if (parkingAvailable)
+          return { ...parkingLot, parkingAvailable: parkingAvailable?.[0] };
+        return parkingLot;
       });
       set({ aroundParkingLotWithAvailable });
     },

@@ -5,7 +5,6 @@ import shallow from 'zustand/shallow';
 import {
   FaInfoCircle,
   FaCrosshairs,
-  FaParking,
   FaSpinner,
   FaWheelchair,
   FaBabyCarriage,
@@ -15,7 +14,6 @@ import CustomMarker from './components/CustomMarker';
 import ParkingInfo from './components/ParkingInfo';
 import { Park, AvailablePark } from '../../types';
 import IconBtn from './components/IconBtn';
-import parkingIconState from './parkingIconState.json';
 import InfoItem from '../../components/InfoItem/InfoItem';
 import parkingType from './parkingType.json';
 import SearchBar from './components/SearchBar';
@@ -129,67 +127,61 @@ const Map = memo(() => {
   // -------------------------- JSX --------------------------
   return (
     <div className="relative h-full w-full">
-      {/* ----------Location Icon---------- */}
-      <div className="absolute top-4 right-4 z-[1] transition delay-150 duration-300 hover:-translate-y-1">
-        <IconBtn
-          onClick={() => {
-            if (userCenter) {
-              googleMap?.panTo(userCenter);
-            } else {
-              googleMap?.panTo(defaultCenter.current);
-            }
-          }}
-        >
-          <FaCrosshairs size="1.6rem" color="blue" />
-        </IconBtn>
-      </div>
-      {/* ----------InfoBox Icon---------- */}
-      <div className="absolute top-16 right-4 z-[1] transition delay-150 duration-300 hover:-translate-y-1">
-        <IconBtn onClick={() => setShowInfoBox((pre) => !pre)}>
-          <FaInfoCircle size="1.6rem" color="blue" />
-        </IconBtn>
-      </div>
-      {/* ----------InfoBox---------- */}
-      <div
-        className=" absolute top-28 right-4 z-[1] origin-top scale-y-0 rounded-md border-2 border-slate-400 bg-light p-2 shadow-md shadow-slate-400 transition-transform data-active:scale-100"
-        data-active={showInfoBox}
-      >
-        {parkingIconState.map((info) => {
-          return (
+      <div className="absolute top-4 right-4 z-[1] flex flex-row-reverse">
+        <div className="ml-2">
+          {/* ----------Location Icon---------- */}
+          <div className="mt-2 transition delay-150 duration-300 hover:-translate-y-1">
+            <IconBtn
+              onClick={() => {
+                if (userCenter) {
+                  googleMap?.panTo(userCenter);
+                } else {
+                  googleMap?.panTo(defaultCenter.current);
+                }
+              }}
+            >
+              <FaCrosshairs size="1.6rem" color="blue" />
+            </IconBtn>
+          </div>
+          {/* ----------InfoBox Icon---------- */}
+          <div className="relative">
+            <div className=" mt-2 transition delay-150 duration-300 hover:-translate-y-1">
+              <IconBtn onClick={() => setShowInfoBox((pre) => !pre)}>
+                <FaInfoCircle size="1.6rem" color="blue" />
+              </IconBtn>
+            </div>
+            {/* ----------InfoBox---------- */}
             <div
-              key={info.name}
-              className="mb-1 flex items-center opacity-0 transition-opacity delay-150 data-active:opacity-100"
+              className=" absolute right-0 top-10 hidden h-52 w-32 origin-top scale-y-0 rounded-md border-2 border-slate-400 bg-light p-2 shadow-md shadow-slate-400 transition-transform  data-active:block data-active:scale-100 data-active:delay-150"
               data-active={showInfoBox}
             >
-              <FaParking size="1.5rem" color={info.color} />
-              <div className="ml-1">{info.name}</div>
+              {parkingType.map((item) => {
+                return (
+                  <InfoItem
+                    key={item.name}
+                    data={item}
+                    haveDescribe
+                    showInfoBox={showInfoBox}
+                  />
+                );
+              })}
+              <InfoItem
+                data={{ name: '身障專用', color: 'text-primary' }}
+                haveDescribe
+                showInfoBox={showInfoBox}
+              >
+                <FaWheelchair />
+              </InfoItem>
+              <InfoItem
+                data={{ name: '懷孕優先', color: 'text-pink-500' }}
+                haveDescribe
+                showInfoBox={showInfoBox}
+              >
+                <FaBabyCarriage />
+              </InfoItem>
             </div>
-          );
-        })}
-        {parkingType.map((item) => {
-          return (
-            <InfoItem
-              key={item.name}
-              data={item}
-              haveDescribe
-              showInfoBox={showInfoBox}
-            />
-          );
-        })}
-        <InfoItem
-          data={{ name: '身障專用', color: 'text-primary' }}
-          haveDescribe
-          showInfoBox={showInfoBox}
-        >
-          <FaWheelchair />
-        </InfoItem>
-        <InfoItem
-          data={{ name: '懷孕優先', color: 'text-pink-500' }}
-          haveDescribe
-          showInfoBox={showInfoBox}
-        >
-          <FaBabyCarriage />
-        </InfoItem>
+          </div>
+        </div>
       </div>
       {/* ----------Position Loading---------- */}
       {isGetPosition && (
@@ -242,17 +234,23 @@ const Map = memo(() => {
           {filterMarker && <MarkerF position={filterMarker} />}
           {searchMarker && <MarkerF position={searchMarker} />}
           {aroundParkingLotWithAvailable?.map((parkingLot) => {
-            return (
-              <CustomMarker
-                key={parkingLot.id}
-                parkingLot={parkingLot}
-                onHandleActiveMarker={handleActiveMarker}
-              />
-            );
+            if (
+              parkingLot.parkingAvailable &&
+              parkingLot.parkingAvailable.availablecar > 0
+            ) {
+              return (
+                <CustomMarker
+                  key={parkingLot.id}
+                  parkingLot={parkingLot}
+                  onHandleActiveMarker={handleActiveMarker}
+                />
+              );
+            }
+            return null;
           })}
           {/* ----------ParkingInfo---------- */}
-          {showParkingLotInfo && (
-            <div className=" absolute bottom-0 left-1/2 max-h-[40%] w-full -translate-x-1/2 overflow-y-scroll rounded-t-2xl p-1 md:top-0 md:left-0 md:max-h-full md:w-[30%] md:-translate-x-0">
+          {showParkingLotInfo !== null && (
+            <div className=" absolute bottom-0 left-1/2 max-h-[40%] w-full -translate-x-1/2 overflow-y-scroll rounded-t-2xl p-1 md:top-0 md:left-0 md:max-h-full md:w-[30%] md:-translate-x-0 md:overflow-auto">
               <ParkingInfo origin={userCenter} parkingLot={showParkingLotInfo} />
             </div>
           )}

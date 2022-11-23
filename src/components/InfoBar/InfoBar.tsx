@@ -5,7 +5,7 @@ import InfoItem from '../InfoItem';
 import { ParkingLotsWithAvailable } from '../../types';
 
 const InfoBar = memo(({ parkingLot }: { parkingLot: ParkingLotsWithAvailable }) => {
-  const { type2, type, summary, Handicap_First, Pregnancy_First } = parkingLot;
+  const { summary, Handicap_First, Pregnancy_First } = parkingLot;
 
   const [parkingLotTypes, setParkingLotTypes] = useState<Array<string>>([]);
 
@@ -31,26 +31,6 @@ const InfoBar = memo(({ parkingLot }: { parkingLot: ParkingLotsWithAvailable }) 
 
   return (
     <div className="mb-1 flex">
-      {type2 === '1' ? (
-        <InfoItem
-          data={{ type: '公', color: 'text-primary' }}
-          haveDescribe={false}
-          showInfoBox
-        />
-      ) : (
-        <InfoItem
-          data={{ type: '民', color: 'text-warning' }}
-          haveDescribe={false}
-          showInfoBox
-        />
-      )}
-      {type === '1' && (
-        <InfoItem
-          data={{ type: '即', color: 'text-success' }}
-          haveDescribe={false}
-          showInfoBox
-        />
-      )}
       {Handicap_First && (
         <InfoItem data={{ color: 'text-primary' }} haveDescribe={false} showInfoBox>
           <FaWheelchair />
