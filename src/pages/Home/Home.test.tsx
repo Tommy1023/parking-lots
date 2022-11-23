@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { render, screen } from '@testing-library/react';
-import Button from './components/Button';
+import Button from '../../components/Button/Button';
 
 test('renders 開始使用 Button', () => {
   render(

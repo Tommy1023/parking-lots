@@ -2,10 +2,10 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { memo, useState, useEffect, useCallback } from 'react';
 import { FaLocationArrow } from 'react-icons/fa';
-import { Park, AvailablePark } from '../../../types';
-import InfoBar from '../../../components/InfoBar';
-import { twd97ToLatlng } from '../../../helpers/coordTransHelper';
-import { prepServiceTime } from '../../../helpers/prepServiceTime';
+import { Park, AvailablePark } from '../../types';
+import InfoBar from '../InfoBar';
+import { twd97ToLatlng } from '../../helpers/coordTransHelper';
+import { prepServiceTime } from '../../helpers/prepServiceTime';
 
 type ParkingInfoProp = {
   origin: google.maps.LatLngLiteral | null;

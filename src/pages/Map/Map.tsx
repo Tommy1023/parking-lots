@@ -10,13 +10,13 @@ import {
   FaBabyCarriage,
 } from 'react-icons/fa';
 import useStore from '../../store';
-import CustomMarker from './components/CustomMarker';
-import ParkingInfo from './components/ParkingInfo';
+import CustomMarker from '../../components/CustomMarker';
+import ParkingInfo from '../../components/ParkingInfo';
 import { Park, AvailablePark } from '../../types';
-import IconBtn from './components/IconBtn';
+import IconBtn from '../../components/IconBtn';
 import InfoItem from '../../components/InfoItem/InfoItem';
 import parkingType from './parkingType.json';
-import SearchBar from './components/SearchBar';
+import SearchBar from '../../components/SearchBar/SearchBar';
 
 type Libraries = ('drawing' | 'geometry' | 'localContext' | 'places')[];
 const libraries: Libraries = ['places'];

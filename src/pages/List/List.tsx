@@ -3,7 +3,7 @@ import shallow from 'zustand/shallow';
 import { useForm } from 'react-hook-form';
 import { FaEraser } from 'react-icons/fa';
 import useStore from '../../store';
-import ListCard from './components/ListCard';
+import ListCard from '../../components/ListCard';
 import TAIPEIAREAS from './taipeiArea.json';
 import { Park } from '../../types';
 

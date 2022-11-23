@@ -2,7 +2,7 @@ import React, { memo, useRef, useState } from 'react';
 import { Autocomplete } from '@react-google-maps/api';
 import { FaBackspace } from 'react-icons/fa';
 import shallow from 'zustand/shallow';
-import useStore from '../../../store';
+import useStore from '../../store';
 
 const SearchBar = memo(() => {
   const { googleMap, setSearchMarker } = useStore((state) => {

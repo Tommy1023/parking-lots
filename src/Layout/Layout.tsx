@@ -2,7 +2,7 @@ import React, { memo } from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
 import { FaMapMarkedAlt, FaFilter } from 'react-icons/fa';
 import style from './layout.module.scss';
-import IsLoading from '../../containers/IsLoading';
+import IsLoading from '../containers/IsLoading';
 
 const Home = () => {
   return (

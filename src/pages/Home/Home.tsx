@@ -2,7 +2,7 @@ import React, { memo } from 'react';
 import { FaMapMarkerAlt } from 'react-icons/fa';
 import shallow from 'zustand/shallow';
 import useStore from '../../store';
-import Button from './components/Button';
+import Button from '../../components/Button';
 
 const Home = memo(() => {
   const { isAppInitializedComplete } = useStore((state) => {

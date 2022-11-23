@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { memo, useRef, useCallback } from 'react';
 import { MarkerF } from '@react-google-maps/api';
-import { Park, AvailablePark } from '../../../types';
-import { twd97ToLatlng } from '../../../helpers/coordTransHelper';
+import { Park, AvailablePark } from '../../types';
+import { twd97ToLatlng } from '../../helpers/coordTransHelper';
 
 type CustomMarkerProp = {
   parkingLot: Park & { parkingAvailable?: AvailablePark | undefined };

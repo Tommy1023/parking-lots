@@ -4,7 +4,7 @@ import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import shallow from 'zustand/shallow';
 import useStore from '../../store';
 import Home from '../../pages/Home';
-import Layout from '../../pages/Layout';
+import Layout from '../../Layout';
 import Map from '../../pages/Map';
 import List from '../../pages/List';
 
