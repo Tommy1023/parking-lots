@@ -8,16 +8,13 @@
 
 #### 此專案目前功能有:
 
-  
-
 - 定位功能
   - 開啟地圖後取得使用者定位
   - 顯示附近 1 公里的停車場圖標
   - 點擊定位圖標返回使用者位置。
 - 搜尋功能
   - Autocompelte
-  - 移動地圖至目的地，顯示目的地及週圍停車場圖標
--停車場資訊
+  - 移動地圖至目的地，顯示目的地及週圍停車場圖標 -停車場資訊
   - 點擊地圖會顯示點擊目標週圍 1 公里的停車場
   - 移動地圖會顯示點地圖中心點週圍 1 公里的停車場
   - 以圖示搭配圖示說明簡化停車場資訊
@@ -30,7 +27,6 @@
   - 顯示停車場詳細資訊
   - 點擊地扯旁圖標可以跳轉至地圖頁面
 
-  
 # 使用技術
 
 ```
@@ -47,8 +43,8 @@ react-hook-form
 
 ### Demo
 
-[佈署位置：https://tommy1023.github.io/parking-lots/parkingList
-](https://tommy1023.github.io/parking-lots/parkingList)
+[佈署位置：https://tommy1023.github.io/parking-lots
+](https://tommy1023.github.io/parking-lots)
 
 <img src="./src/assets/images/home.png" alt="drawing" width="200"/>
 <img src="./src/assets/images/map.png" alt="drawing" width="200"/>
