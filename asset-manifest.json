@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/parking-lots/static/css/main.c6e2a3b6.css",
-    "main.js": "/parking-lots/static/js/main.495c4694.js",
+    "main.css": "/parking-lots/static/css/main.299a5e26.css",
+    "main.js": "/parking-lots/static/js/main.582b2fd6.js",
     "index.html": "/parking-lots/index.html",
-    "main.c6e2a3b6.css.map": "/parking-lots/static/css/main.c6e2a3b6.css.map",
-    "main.495c4694.js.map": "/parking-lots/static/js/main.495c4694.js.map"
+    "main.299a5e26.css.map": "/parking-lots/static/css/main.299a5e26.css.map",
+    "main.582b2fd6.js.map": "/parking-lots/static/js/main.582b2fd6.js.map"
   },
   "entrypoints": [
-    "static/css/main.c6e2a3b6.css",
-    "static/js/main.495c4694.js"
+    "static/css/main.299a5e26.css",
+    "static/js/main.582b2fd6.js"
   ]
 }
