@@ -58,7 +58,7 @@ const ListCard = memo(({ parkingLot }: { parkingLot: ParkingLotsWithAvailable })
               <div className="ml-1">
                 {parkingAvailable && parkingAvailable.availablecar > 0
                   ? `${parkingAvailable.availablecar} / ${totalcar}`
-                  : totalcar}
+                  : ` 離線中 / ${totalcar}`}
               </div>
             </div>
           )}
@@ -74,9 +74,9 @@ const ListCard = memo(({ parkingLot }: { parkingLot: ParkingLotsWithAvailable })
             <div className="mr-3 flex items-center">
               <FaMotorcycle />
               <div className="ml-1">
-                {parkingAvailable && parkingAvailable.availablemotor
+                {parkingAvailable && parkingAvailable.availablemotor > 0
                   ? `${parkingAvailable.availablemotor} / ${totalmotor}`
-                  : totalmotor}
+                  : ` 離線中 / ${totalmotor}`}
               </div>
             </div>
           )}
@@ -84,9 +84,9 @@ const ListCard = memo(({ parkingLot }: { parkingLot: ParkingLotsWithAvailable })
             <div className="mr-3 flex items-center">
               <FaBusAlt />
               <div className="ml-1">
-                {parkingAvailable && parkingAvailable.availablebus
+                {parkingAvailable && parkingAvailable.availablebus > 0
                   ? `${parkingAvailable.availablebus} / ${totalbus}`
-                  : totalbus}
+                  : ` 離線中 / ${totalbus}`}
               </div>
             </div>
           )}
