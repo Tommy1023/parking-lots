@@ -2,12 +2,11 @@ import React, { memo, useRef, useState } from 'react';
 import { Autocomplete } from '@react-google-maps/api';
 import { FaBackspace } from 'react-icons/fa';
 import shallow from 'zustand/shallow';
-import useStore from '../../store';
+import useMapStore from '../../store/useMapStore';
 
-const SearchBar = memo(() => {
-  const { googleMap, setSearchMarker } = useStore((state) => {
+const SearchBar = memo(({ map }: { map: google.maps.Map | null }) => {
+  const { setSearchMarker } = useMapStore((state) => {
     return {
-      googleMap: state.googleMap,
       setSearchMarker: state.setSearchMarker,
     };
   }, shallow);
@@ -27,12 +26,12 @@ const SearchBar = memo(() => {
             console.log('Autocomplete is not loaded yet!');
           } else {
             const place = autocompleteRef.current.getPlace();
-            if (place?.geometry?.viewport && googleMap) {
-              googleMap.fitBounds(place.geometry.viewport);
+            if (place?.geometry?.viewport && map) {
+              map.fitBounds(place.geometry.viewport);
             }
-            if (place?.geometry?.location && googleMap) {
-              googleMap.setCenter(place.geometry.location);
-              googleMap.setZoom(15);
+            if (place?.geometry?.location && map) {
+              map.setCenter(place.geometry.location);
+              map.setZoom(15);
               setSearchMarker({
                 lat: place.geometry.location.lat(),
                 lng: place.geometry.location.lng(),

@@ -1,11 +1,11 @@
 import React, { memo } from 'react';
 import { FaMapMarkerAlt } from 'react-icons/fa';
 import shallow from 'zustand/shallow';
-import useStore from '../../store';
+import useMapStore from '../../store/useMapStore';
 import Button from '../../components/Button';
 
 const Home = memo(() => {
-  const { isAppInitializedComplete } = useStore((state) => {
+  const { isAppInitializedComplete } = useMapStore((state) => {
     return {
       isAppInitializedComplete: state.isAppInitializedComplete,
     };

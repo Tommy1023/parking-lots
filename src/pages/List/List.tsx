@@ -2,10 +2,11 @@ import React, { memo, useState, useEffect, useCallback } from 'react';
 import shallow from 'zustand/shallow';
 import { useForm } from 'react-hook-form';
 import { FaEraser } from 'react-icons/fa';
-import useStore from '../../store';
+import { useMatch } from 'react-router-dom';
+import useStore from '../../store/useMapStore';
 import ListCard from '../../components/ListCard';
 import TAIPEIAREAS from './taipeiArea.json';
-import { Park } from '../../types';
+import { Park, AvailablePark, ParkingLotsWithAvailable } from '../../types';
 
 type FormValues = {
   area: string;
@@ -14,26 +15,30 @@ type FormValues = {
 
 const List = () => {
   const {
-    area,
-    keywords,
     parkingLots,
     allAvailable,
-    parkingLotsWithAvailable,
-    getParkingLotsWithAvailable,
-    setArea,
-    setKeywords,
+    userCenter,
+    setMapCenter,
+    setClickCoord,
+    setFilterMarker,
   } = useStore((state) => {
     return {
-      area: state.area,
-      keywords: state.keywords,
       parkingLots: state.parkingLots,
       allAvailable: state.allAvailable,
-      parkingLotsWithAvailable: state.parkingLotsWithAvailable,
-      getParkingLotsWithAvailable: state.getParkingLotsWithAvailable,
-      setArea: state.setArea,
-      setKeywords: state.setKeywords,
+      userCenter: state.userCenter,
+      setMapCenter: state.setMapCenter,
+      setClickCoord: state.setClickCoord,
+      setFilterMarker: state.setFilterMarker,
     };
   }, shallow);
+
+  const [area, setArea] = useState('');
+  const [keywords, setKeywords] = useState('');
+  const [parkingLotsWithAvailable, setParkingLotsWithAvailable] = useState<
+    ParkingLotsWithAvailable[] | null
+  >(null);
+
+  const isMatch = useMatch('/map');
 
   const { register, handleSubmit, setValue } = useForm<FormValues>({
     defaultValues: {
@@ -64,7 +69,7 @@ const List = () => {
   };
 
   const parkingLotFilter = useCallback(
-    (data: Array<Park>, condition: FormValues): void => {
+    (data: Array<Park> | null, condition: FormValues): void => {
       if (!condition || !data) return;
       if (condition.area && condition.keywords) {
         const areaFilterRes = data.filter((parkingLot) => {
@@ -100,6 +105,20 @@ const List = () => {
     setFilterParkingLots([]);
   };
 
+  const getParkingLotsWithAvailable = useCallback(
+    (ParkingLots: Park[] | null, AllAvailable: AvailablePark[] | null) => {
+      if (!ParkingLots || !AllAvailable) return;
+      const result = ParkingLots.map((parkingLot) => {
+        const parkingAvailable = AllAvailable?.filter((available) => {
+          return available.id === parkingLot.id;
+        });
+        return { ...parkingLot, parkingAvailable: parkingAvailable?.[0] };
+      });
+      setParkingLotsWithAvailable(result);
+    },
+    [],
+  );
+
   useEffect(() => {
     parkingLotFilter(parkingLots, { area, keywords });
   }, [parkingLots, area, keywords, parkingLotFilter]);
@@ -107,6 +126,15 @@ const List = () => {
   useEffect(() => {
     getParkingLotsWithAvailable(filterParkingLots, allAvailable);
   }, [filterParkingLots, allAvailable, getParkingLotsWithAvailable]);
+
+  useEffect(() => {
+    if (!isMatch) {
+      setFilterMarker(null);
+      setClickCoord(userCenter);
+      setMapCenter(userCenter);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="relative h-full w-full overflow-y-scroll bg-[#518ef0] p-6">
@@ -149,7 +177,7 @@ const List = () => {
       </form>
       {keywords || area ? (
         <div className="mt-[70px] h-[90%]">
-          {parkingLotsWithAvailable.map((parkingLot) => {
+          {parkingLotsWithAvailable?.map((parkingLot) => {
             return <ListCard key={parkingLot.id} parkingLot={parkingLot} />;
           })}
         </div>

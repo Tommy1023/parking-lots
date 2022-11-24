@@ -11,7 +11,7 @@ import {
 import { Link } from 'react-router-dom';
 import shallow from 'zustand/shallow';
 import { ParkingLotsWithAvailable } from '../../types';
-import useStore from '../../store';
+import useMapStore from '../../store/useMapStore';
 import InfoBar from '../InfoBar';
 import { prepServiceTime } from '../../helpers/prepServiceTime';
 
@@ -35,10 +35,9 @@ const ListCard = memo(({ parkingLot }: { parkingLot: ParkingLotsWithAvailable })
   const standbyChargeStationCount = chargeStationList?.filter((scoketStatus) => {
     return scoketStatus.spot_status === '待機中';
   });
-  const { goToMap, parkingLotsWithAvailable } = useStore((state) => {
+  const { goToMap } = useMapStore((state) => {
     return {
       goToMap: state.goToMap,
-      parkingLotsWithAvailable: state.parkingLotsWithAvailable,
     };
   }, shallow);
 
@@ -109,7 +108,7 @@ const ListCard = memo(({ parkingLot }: { parkingLot: ParkingLotsWithAvailable })
             className="flex cursor-pointer items-center"
             to="/map"
             onClick={() => {
-              goToMap(tw97x, tw97y, parkingLotsWithAvailable);
+              goToMap(tw97x, tw97y);
             }}
           >
             <FaMapMarkerAlt color="#911d1d" />

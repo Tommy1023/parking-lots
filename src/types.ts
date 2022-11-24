@@ -1,19 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export type State = {
   isAppInitializedComplete: boolean;
-  googleMap: google.maps.Map | null;
   isLoading: boolean;
   isGetPosition: boolean;
-  parkingLots: Array<Park>;
-  allAvailable: Array<AvailablePark>;
+  parkingLots: Array<Park> | null;
+  allAvailable: Array<AvailablePark> | null;
   userCenter: google.maps.LatLngLiteral | null;
   mapCenter: google.maps.LatLngLiteral | null;
   clickCoord: google.maps.LatLngLiteral | null;
   filterMarker: google.maps.LatLngLiteral | null;
-  aroundParkingLotWithAvailable: Array<ParkingLotsWithAvailable>;
-  parkingLotsWithAvailable: Array<ParkingLotsWithAvailable>;
-  area: string;
-  keywords: string;
   searchMarker: google.maps.LatLngLiteral | null;
 };
 
@@ -24,28 +19,11 @@ export type ParkingLotsWithAvailable = Park & {
 export type Action = {
   init: () => void;
   getGeolocation: () => void;
-  updateParkingLots: () => void;
   updateAllAvailable: () => void;
-  getAroundParkingLotsWithAvailable: (
-    parkingLots: Park[],
-    clickCoord: google.maps.LatLngLiteral,
-    allAvailable: AvailablePark[] | null,
-  ) => void;
-  getParkingLotsWithAvailable: (
-    parkingLots: Park[],
-    allAvailable: AvailablePark[],
-  ) => void;
-  goToMap: (
-    tw97x: string,
-    tw97y: string,
-    parkingLotsWithAvailable: ParkingLotsWithAvailable[],
-  ) => void;
-  setGoogleMap: (map: google.maps.Map | null) => void;
+  goToMap: (tw97x: string, tw97y: string) => void;
   setClickCoord: (latlng: google.maps.LatLngLiteral | null) => void;
   setFilterMarker: (latlng: google.maps.LatLngLiteral | null) => void;
   setMapCenter: (latlng: google.maps.LatLngLiteral | null) => void;
-  setArea: (area: string) => void;
-  setKeywords: (keywords: string) => void;
   setSearchMarker: (latlng: google.maps.LatLngLiteral | null) => void;
 };
 

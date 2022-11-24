@@ -2,14 +2,14 @@
 import React, { useEffect } from 'react';
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import shallow from 'zustand/shallow';
-import useStore from '../../store';
+import useMapStore from '../../store/useMapStore';
 import Home from '../../pages/Home';
 import Layout from '../../Layout';
 import Map from '../../pages/Map';
 import List from '../../pages/List';
 
 const App = () => {
-  const { init, updateAllAvailable } = useStore((state) => {
+  const { init, updateAllAvailable } = useMapStore((state) => {
     return {
       init: state.init,
       updateAllAvailable: state.updateAllAvailable,

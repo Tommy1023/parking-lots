@@ -9,65 +9,61 @@ import {
   FaWheelchair,
   FaBabyCarriage,
 } from 'react-icons/fa';
-import useStore from '../../store';
+import useStore from '../../store/useMapStore';
 import CustomMarker from '../../components/CustomMarker';
 import ParkingInfo from '../../components/ParkingInfo';
-import { Park, AvailablePark } from '../../types';
+import { Park, AvailablePark, ParkingLotsWithAvailable } from '../../types';
 import IconBtn from '../../components/IconBtn';
 import InfoItem from '../../components/InfoItem/InfoItem';
 import parkingType from './parkingType.json';
 import SearchBar from '../../components/SearchBar/SearchBar';
+import { latlngToTwd97 } from '../../helpers/coordTransHelper';
 
 type Libraries = ('drawing' | 'geometry' | 'localContext' | 'places')[];
 const libraries: Libraries = ['places'];
 
 const Map = memo(() => {
-  // -------------------------- Hooks --------------------------
+  // -------------------------- States --------------------------
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_API_KEY!,
     libraries,
   });
   const {
-    googleMap,
+    parkingLots,
+    allAvailable,
     isGetPosition,
     getGeolocation,
-    parkingLots,
     userCenter,
     mapCenter,
-    clickCoord,
-    allAvailable,
-    getAroundParkingLotsWithAvailable,
-    aroundParkingLotWithAvailable,
-    filterMarker,
-    setGoogleMap,
-    setClickCoord,
     setMapCenter,
+    clickCoord,
+    setClickCoord,
     searchMarker,
+    filterMarker,
   } = useStore((state) => {
     return {
-      googleMap: state.googleMap,
+      parkingLots: state.parkingLots,
+      allAvailable: state.allAvailable,
       isGetPosition: state.isGetPosition,
       getGeolocation: state.getGeolocation,
-      parkingLots: state.parkingLots,
       userCenter: state.userCenter,
       mapCenter: state.mapCenter,
-      clickCoord: state.clickCoord,
-      allAvailable: state.allAvailable,
-      getAroundParkingLotsWithAvailable: state.getAroundParkingLotsWithAvailable,
-      aroundParkingLotWithAvailable: state.aroundParkingLotWithAvailable,
-      filterMarker: state.filterMarker,
-      setGoogleMap: state.setGoogleMap,
-      setClickCoord: state.setClickCoord,
       setMapCenter: state.setMapCenter,
+      clickCoord: state.clickCoord,
+      setClickCoord: state.setClickCoord,
       searchMarker: state.searchMarker,
+      filterMarker: state.filterMarker,
     };
   }, shallow);
 
-  // -------------------------- States --------------------------
+  const [googleMap, setGoogleMap] = useState<google.maps.Map | null>(null);
   const defaultCenter = useRef<{ lat: number; lng: number }>({
     lat: 25.03369,
     lng: 121.564128,
   });
+  const [aroundParkingLotWithAvailable, setAroundParkingLotWithAvailable] = useState<
+    ParkingLotsWithAvailable[] | null
+  >(null);
   const [showParkingLotInfo, setShowParkingLotInfo] = useState<
     | (Park & {
         parkingAvailable?: AvailablePark | undefined;
@@ -77,6 +73,44 @@ const Map = memo(() => {
   const [showInfoBox, setShowInfoBox] = useState<boolean>(false);
 
   // -------------------------- Actions --------------------------
+  const getAroundParkingLotsWithAvailable = useCallback(
+    (
+      ParkingLots: Park[] | null,
+      ClickCoord: google.maps.LatLngLiteral,
+      AllAvailable: AvailablePark[] | null,
+    ) => {
+      if (!ParkingLots || !ClickCoord) return;
+      // 篩選範圍內停車場
+      const aroundParkingLots: Array<Park> = ParkingLots.filter((parkingLot) => {
+        const twd97ClickCoord = latlngToTwd97(ClickCoord.lat, ClickCoord.lng);
+        const top = twd97ClickCoord.twd97x + 1000;
+        const bottom = twd97ClickCoord.twd97x - 1000;
+        const left = twd97ClickCoord.twd97y - 1000;
+        const right = twd97ClickCoord.twd97y + 1000;
+        return (
+          parseFloat(parkingLot.tw97x) < top &&
+          parseFloat(parkingLot.tw97x) > bottom &&
+          parseFloat(parkingLot.tw97y) > left &&
+          parseFloat(parkingLot.tw97y) < right
+        );
+      });
+      if (!aroundParkingLots) return;
+      // 合併停車場及剩餘車位資料
+      const result: Array<Park> & {
+        parkingAvailable?: AvailablePark;
+      } = aroundParkingLots.map((parkingLot) => {
+        const parkingAvailable = AllAvailable?.filter((available) => {
+          return available.id === parkingLot.id;
+        });
+        if (parkingAvailable)
+          return { ...parkingLot, parkingAvailable: parkingAvailable?.[0] };
+        return parkingLot;
+      });
+      setAroundParkingLotWithAvailable(result);
+    },
+    [],
+  );
+
   // 點擊地圖取得點擊地點座標。
   const onMapClick = (e: google.maps.MapMouseEvent) => {
     if (e.latLng) {
@@ -227,7 +261,7 @@ const Map = memo(() => {
             className="absolute top-3 left-[50%] w-[70%] -translate-x-[50%] md:w-[50%] md:data-active:left-[60%]"
             data-active={!!showParkingLotInfo}
           >
-            <SearchBar />
+            <SearchBar map={googleMap} />
           </div>
           {/* ----------Markers---------- */}
           {userCenter && <MarkerF position={userCenter} />}

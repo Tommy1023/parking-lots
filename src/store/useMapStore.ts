@@ -1,28 +1,23 @@
 /* eslint-disable no-alert */
 import create from 'zustand';
 import { fetchAllAvailable, fetchParkingLots } from '../service/parkingLotsApi';
-import { State, Action, Park, AvailablePark } from '../types';
-import { latlngToTwd97, twd97ToLatlng } from '../helpers/coordTransHelper';
+import { State, Action } from '../types';
+import { twd97ToLatlng } from '../helpers/coordTransHelper';
 
 const initialize: State = {
   isAppInitializedComplete: false,
   isLoading: false,
   isGetPosition: false,
-  googleMap: null,
-  parkingLots: [],
-  allAvailable: [],
+  parkingLots: null,
+  allAvailable: null,
   userCenter: null,
   mapCenter: null,
   clickCoord: { lat: 25.03369, lng: 121.564128 },
   filterMarker: null,
-  aroundParkingLotWithAvailable: [],
-  parkingLotsWithAvailable: [],
-  area: '',
-  keywords: '',
   searchMarker: null,
 };
 
-const useStore = create<State & Action>((set) => {
+const useMapStore = create<State & Action>((set) => {
   return {
     // initialize state
     ...initialize,
@@ -30,6 +25,7 @@ const useStore = create<State & Action>((set) => {
     // actions
     async init() {
       console.log('App Initialized Start');
+      set({ isAppInitializedComplete: false, isLoading: true });
       // 取得停車場資料
       try {
         const parkingLots = await fetchParkingLots();
@@ -49,7 +45,7 @@ const useStore = create<State & Action>((set) => {
         console.log('getAllAvailable error:', error);
         alert('無法取得停車場資訊，請稍後再試');
       }
-      set({ isAppInitializedComplete: true });
+      set({ isAppInitializedComplete: true, isLoading: false });
       console.log('App Initialized Complete');
     },
     async getGeolocation() {
@@ -84,15 +80,6 @@ const useStore = create<State & Action>((set) => {
         }
       }
     },
-    updateParkingLots() {
-      fetchParkingLots()
-        .then((res) => {
-          if (res.statusText === 'OK') set({ parkingLots: res.data.data.park });
-        })
-        .catch((err) => {
-          console.log('updateParkingLots error:', err);
-        });
-    },
     updateAllAvailable() {
       fetchAllAvailable()
         .then((res) => {
@@ -102,58 +89,13 @@ const useStore = create<State & Action>((set) => {
           console.log('updateAllAvailable error:', err);
         });
     },
-    getAroundParkingLotsWithAvailable(parkingLots, clickCoord, allAvailable) {
-      if (!parkingLots || !clickCoord) return;
-      // 篩選範圍內停車場
-      const aroundParkingLots: Array<Park> = parkingLots.filter((parkingLot) => {
-        const twd97ClickCoord = latlngToTwd97(clickCoord.lat, clickCoord.lng);
-        const top = twd97ClickCoord.twd97x + 1000;
-        const bottom = twd97ClickCoord.twd97x - 1000;
-        const left = twd97ClickCoord.twd97y - 1000;
-        const right = twd97ClickCoord.twd97y + 1000;
-        return (
-          parseFloat(parkingLot.tw97x) < top &&
-          parseFloat(parkingLot.tw97x) > bottom &&
-          parseFloat(parkingLot.tw97y) > left &&
-          parseFloat(parkingLot.tw97y) < right
-        );
-      });
-      if (!aroundParkingLots) return;
-      // 合併停車場及剩餘車位資料
-      const aroundParkingLotWithAvailable: Array<Park> & {
-        parkingAvailable?: AvailablePark;
-      } = aroundParkingLots.map((parkingLot) => {
-        const parkingAvailable = allAvailable?.filter((available) => {
-          return available.id === parkingLot.id;
-        });
-        if (parkingAvailable)
-          return { ...parkingLot, parkingAvailable: parkingAvailable?.[0] };
-        return parkingLot;
-      });
-      set({ aroundParkingLotWithAvailable });
-    },
-    getParkingLotsWithAvailable(parkingLots, allAvailable) {
-      if (!parkingLots || !allAvailable) return;
-      const result = parkingLots.map((parkingLot) => {
-        const parkingAvailable = allAvailable?.filter((available) => {
-          return available.id === parkingLot.id;
-        });
-        return { ...parkingLot, parkingAvailable: parkingAvailable?.[0] };
-      });
-      // eslint-disable-next-line consistent-return
-      set({ parkingLotsWithAvailable: result });
-    },
-    goToMap(tw97x, tw97y, parkingAvailable) {
+    goToMap(tw97x, tw97y) {
       const latlng = twd97ToLatlng(parseFloat(tw97x), parseFloat(tw97y));
       set({
         mapCenter: latlng,
         filterMarker: latlng,
         clickCoord: latlng,
-        aroundParkingLotWithAvailable: parkingAvailable,
       });
-    },
-    setGoogleMap(map) {
-      set({ googleMap: map });
     },
     setClickCoord(latlng) {
       set({ clickCoord: latlng });
@@ -164,16 +106,10 @@ const useStore = create<State & Action>((set) => {
     setMapCenter(latlng) {
       set({ mapCenter: latlng });
     },
-    setArea(area) {
-      set({ area });
-    },
-    setKeywords(keywords) {
-      set({ keywords });
-    },
     setSearchMarker(latlng) {
       set({ searchMarker: latlng, clickCoord: latlng });
     },
   };
 });
 
-export default useStore;
+export default useMapStore;
